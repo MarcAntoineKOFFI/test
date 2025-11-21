@@ -289,6 +289,34 @@
             color: #666;
             font-style: italic;
         }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 212, 255, 0.9);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .notification.error {
+            background: rgba(255, 71, 87, 0.9);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
     </style>
 </head>
 <body>
@@ -379,8 +407,94 @@
             'NFLX', 'ADBE', 'CRM', 'INTC', 'AMD', 'PYPL', 'CSCO', 'PFE'
         ];
 
+        // Stock name mapping for mock data
+        const STOCK_NAMES = {
+            '^GSPC': 'S&P 500',
+            '^IXIC': 'NASDAQ Composite',
+            '^DJI': 'Dow Jones Industrial Average',
+            'AAPL': 'Apple Inc.',
+            'MSFT': 'Microsoft Corporation',
+            'GOOGL': 'Alphabet Inc.',
+            'AMZN': 'Amazon.com Inc.',
+            'NVDA': 'NVIDIA Corporation',
+            'TSLA': 'Tesla, Inc.',
+            'META': 'Meta Platforms Inc.',
+            'BRK-B': 'Berkshire Hathaway Inc.',
+            'V': 'Visa Inc.',
+            'JNJ': 'Johnson & Johnson',
+            'WMT': 'Walmart Inc.',
+            'JPM': 'JPMorgan Chase & Co.',
+            'MA': 'Mastercard Inc.',
+            'PG': 'Procter & Gamble Co.',
+            'UNH': 'UnitedHealth Group Inc.',
+            'DIS': 'The Walt Disney Company',
+            'HD': 'The Home Depot Inc.',
+            'BAC': 'Bank of America Corp.',
+            'NFLX': 'Netflix Inc.',
+            'ADBE': 'Adobe Inc.',
+            'CRM': 'Salesforce Inc.',
+            'INTC': 'Intel Corporation',
+            'AMD': 'Advanced Micro Devices Inc.',
+            'PYPL': 'PayPal Holdings Inc.',
+            'CSCO': 'Cisco Systems Inc.',
+            'PFE': 'Pfizer Inc.'
+        };
+
+        // Base prices for realistic mock data simulation
+        const BASE_PRICES = {
+            '^GSPC': 4500,
+            '^IXIC': 14000,
+            '^DJI': 35000,
+            'AAPL': 180,
+            'MSFT': 370,
+            'GOOGL': 140,
+            'AMZN': 150,
+            'NVDA': 480,
+            'TSLA': 240,
+            'META': 320,
+            'BRK-B': 360,
+            'V': 250,
+            'JNJ': 160,
+            'WMT': 160,
+            'JPM': 150,
+            'MA': 400,
+            'PG': 150,
+            'UNH': 520,
+            'DIS': 95,
+            'HD': 320,
+            'BAC': 30,
+            'NFLX': 450,
+            'ADBE': 550,
+            'CRM': 210,
+            'INTC': 45,
+            'AMD': 140,
+            'PYPL': 60,
+            'CSCO': 50,
+            'PFE': 30
+        };
+
         let watchlistSymbols = [];
         let autoRefreshTimer = null;
+
+        // Show notification to user
+        function showNotification(message, isError = false) {
+            // Remove any existing notification
+            const existing = document.querySelector('.notification');
+            if (existing) {
+                existing.remove();
+            }
+
+            // Create new notification
+            const notification = document.createElement('div');
+            notification.className = 'notification' + (isError ? ' error' : '');
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            // Auto-remove after 3 seconds
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
 
         // Initialize on page load
         window.addEventListener('DOMContentLoaded', () => {
@@ -482,12 +596,12 @@
             const symbol = input.value.trim().toUpperCase();
 
             if (!symbol) {
-                alert('Please enter a stock symbol');
+                showNotification('Please enter a stock symbol', true);
                 return;
             }
 
             if (watchlistSymbols.includes(symbol)) {
-                alert('Stock already in watchlist');
+                showNotification('Stock already in watchlist', true);
                 return;
             }
 
@@ -495,6 +609,7 @@
             saveWatchlistToStorage();
             input.value = '';
             loadWatchlist();
+            showNotification(`${symbol} added to watchlist`);
         }
 
         // Handle Enter key in watchlist input
@@ -677,7 +792,7 @@
                         return data;
                     }
                 } catch (error) {
-                    console.log(`Method failed for ${symbol}, trying next method...`);
+                    console.warn(`Method failed for ${symbol}, trying next method...`);
                     continue;
                 }
             }
@@ -688,81 +803,20 @@
 
         // Generate realistic mock data for demonstration
         function generateMockData(symbol) {
-            // Stock name mapping
-            const stockNames = {
-                '^GSPC': 'S&P 500',
-                '^IXIC': 'NASDAQ Composite',
-                '^DJI': 'Dow Jones Industrial Average',
-                'AAPL': 'Apple Inc.',
-                'MSFT': 'Microsoft Corporation',
-                'GOOGL': 'Alphabet Inc.',
-                'AMZN': 'Amazon.com Inc.',
-                'NVDA': 'NVIDIA Corporation',
-                'TSLA': 'Tesla, Inc.',
-                'META': 'Meta Platforms Inc.',
-                'BRK-B': 'Berkshire Hathaway Inc.',
-                'V': 'Visa Inc.',
-                'JNJ': 'Johnson & Johnson',
-                'WMT': 'Walmart Inc.',
-                'JPM': 'JPMorgan Chase & Co.',
-                'MA': 'Mastercard Inc.',
-                'PG': 'Procter & Gamble Co.',
-                'UNH': 'UnitedHealth Group Inc.',
-                'DIS': 'The Walt Disney Company',
-                'HD': 'The Home Depot Inc.',
-                'BAC': 'Bank of America Corp.',
-                'NFLX': 'Netflix Inc.',
-                'ADBE': 'Adobe Inc.',
-                'CRM': 'Salesforce Inc.',
-                'INTC': 'Intel Corporation',
-                'AMD': 'Advanced Micro Devices Inc.',
-                'PYPL': 'PayPal Holdings Inc.',
-                'CSCO': 'Cisco Systems Inc.',
-                'PFE': 'Pfizer Inc.'
-            };
-
-            // Base prices for realistic simulation
-            const basePrices = {
-                '^GSPC': 4500,
-                '^IXIC': 14000,
-                '^DJI': 35000,
-                'AAPL': 180,
-                'MSFT': 370,
-                'GOOGL': 140,
-                'AMZN': 150,
-                'NVDA': 480,
-                'TSLA': 240,
-                'META': 320,
-                'BRK-B': 360,
-                'V': 250,
-                'JNJ': 160,
-                'WMT': 160,
-                'JPM': 150,
-                'MA': 400,
-                'PG': 150,
-                'UNH': 520,
-                'DIS': 95,
-                'HD': 320,
-                'BAC': 30,
-                'NFLX': 450,
-                'ADBE': 550,
-                'CRM': 210,
-                'INTC': 45,
-                'AMD': 140,
-                'PYPL': 60,
-                'CSCO': 50,
-                'PFE': 30
-            };
-
             // Get base price or use random for unknown symbols
-            const basePrice = basePrices[symbol] || (Math.random() * 200 + 50);
+            const basePrice = BASE_PRICES[symbol] || (Math.random() * 200 + 50);
+            
+            // Use symbol as seed for consistent but varied results
+            const seed = symbol.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+            const pseudoRandom = (seed * 9301 + 49297) % 233280 / 233280;
             
             // Generate realistic price variation (-5% to +5%)
-            const variation = (Math.random() - 0.5) * 0.1;
+            const variation = (pseudoRandom - 0.5) * 0.1;
             const price = basePrice * (1 + variation);
             
-            // Generate daily change (-3% to +3%)
-            const changePercent = (Math.random() - 0.5) * 6;
+            // Generate daily change (-3% to +3%) with time-based variation
+            const timeVariation = (new Date().getMinutes() / 60) - 0.5;
+            const changePercent = timeVariation * 6;
             const change = price * (changePercent / 100);
 
             return {
@@ -770,21 +824,23 @@
                 regularMarketPrice: price,
                 regularMarketChange: change,
                 regularMarketChangePercent: changePercent,
-                shortName: stockNames[symbol] || symbol,
-                longName: stockNames[symbol] || `${symbol} Corporation`
+                shortName: STOCK_NAMES[symbol] || symbol,
+                longName: STOCK_NAMES[symbol] || `${symbol} Corporation`
             };
         }
 
         // Generate dynamic talking points
         function generateTalkingPoints() {
-            const currentHour = new Date().getHours();
+            // Get current time in ET (market timezone)
+            const etTime = new Date().toLocaleString("en-US", {timeZone: "America/New_York"});
+            const currentHour = new Date(etTime).getHours();
             const points = [];
 
-            // Time-based points
+            // Time-based points (Market hours: 9:30 AM - 4:00 PM ET)
             if (currentHour >= 9 && currentHour < 16) {
-                points.push('Market is currently open - Live trading in progress');
+                points.push('Market is currently open - Live trading in progress (Eastern Time)');
             } else {
-                points.push('Market is currently closed - Showing last closing prices');
+                points.push('Market is currently closed - Showing last closing prices (Eastern Time)');
             }
 
             // General market points
