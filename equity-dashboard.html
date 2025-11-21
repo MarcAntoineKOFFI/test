@@ -397,7 +397,7 @@
         const MARKET_INDICES = [
             { symbol: '^GSPC', name: 'S&P 500' },
             { symbol: '^IXIC', name: 'NASDAQ' },
-            { symbol: '^DJI', name: 'DOW Jones' }
+            { symbol: '^DJI', name: 'Dow Jones' }
         ];
 
         // Sample data for top gainers/losers (using popular stocks)
@@ -472,6 +472,11 @@
             'CSCO': 50,
             'PFE': 30
         };
+
+        // Constants for pseudo-random number generation (Linear Congruential Generator)
+        const PRNG_MULTIPLIER = 9301;
+        const PRNG_INCREMENT = 49297;
+        const PRNG_MODULUS = 233280;
 
         let watchlistSymbols = [];
         let autoRefreshTimer = null;
@@ -808,7 +813,7 @@
             
             // Use symbol as seed for consistent but varied results
             const seed = symbol.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-            const pseudoRandom = (seed * 9301 + 49297) % 233280 / 233280;
+            const pseudoRandom = (seed * PRNG_MULTIPLIER + PRNG_INCREMENT) % PRNG_MODULUS / PRNG_MODULUS;
             
             // Generate realistic price variation (-5% to +5%)
             const variation = (pseudoRandom - 0.5) * 0.1;
