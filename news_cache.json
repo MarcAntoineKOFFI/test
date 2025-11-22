@@ -1,0 +1,1997 @@
+{
+  "AAPL": {
+    "last_updated": "2025-11-23T00:24:43.891857",
+    "articles": [
+      {
+        "event_id": "AAPL_353af70b-efab-40f8-ad6f-78f078726855",
+        "event_type": "NEWS",
+        "symbol": "AAPL",
+        "timestamp": "2025-11-23T00:24:43.891131",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "AAPL_e0eec228-cedd-421c-bfb3-6d29098ffbd5",
+        "event_type": "NEWS",
+        "symbol": "AAPL",
+        "timestamp": "2025-11-23T00:24:43.891251",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "AAPL_cf0cc3c7-0ea7-4556-a613-b95563153991",
+        "event_type": "NEWS",
+        "symbol": "AAPL",
+        "timestamp": "2025-11-23T00:24:43.891322",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "AAPL_0c47454f-73c3-4296-a690-bef537f19cd4",
+        "event_type": "NEWS",
+        "symbol": "AAPL",
+        "timestamp": "2025-11-23T00:24:43.891370",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "AAPL_2fcca80f-9e06-412c-b0bd-d21bce28c3cb",
+        "event_type": "NEWS",
+        "symbol": "AAPL",
+        "timestamp": "2025-11-23T00:24:43.891413",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "AAPL_a3df541a-756d-48ab-a828-68df6e554dbd",
+        "event_type": "NEWS",
+        "symbol": "AAPL",
+        "timestamp": "2025-11-23T00:24:43.891457",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "AAPL_36c41036-f154-428a-847b-d9a238b6b5da",
+        "event_type": "NEWS",
+        "symbol": "AAPL",
+        "timestamp": "2025-11-23T00:24:43.891497",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "AAPL_5a38884e-78e4-412a-b59d-f69d2ad8b8cd",
+        "event_type": "NEWS",
+        "symbol": "AAPL",
+        "timestamp": "2025-11-23T00:24:43.891536",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "AAPL_a3b7c173-86b9-446d-91f5-8402bd149ec9",
+        "event_type": "NEWS",
+        "symbol": "AAPL",
+        "timestamp": "2025-11-23T00:24:43.891580",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "AAPL_a6d627d8-b81b-494c-bb50-74af4a36777e",
+        "event_type": "NEWS",
+        "symbol": "AAPL",
+        "timestamp": "2025-11-23T00:24:43.891620",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      }
+    ]
+  },
+  "ADBE": {
+    "last_updated": "2025-11-23T00:24:47.381158",
+    "articles": [
+      {
+        "event_id": "ADBE_477af5ae-b6ec-47ed-a02c-2e8f41b50a05",
+        "event_type": "NEWS",
+        "symbol": "ADBE",
+        "timestamp": "2025-11-23T00:24:47.380420",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "ADBE_4fe50480-d699-4031-9df0-a6c975b0eb27",
+        "event_type": "NEWS",
+        "symbol": "ADBE",
+        "timestamp": "2025-11-23T00:24:47.380481",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "ADBE_ed63176a-8c05-4936-8ae3-d432c24a9be3",
+        "event_type": "NEWS",
+        "symbol": "ADBE",
+        "timestamp": "2025-11-23T00:24:47.380505",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "ADBE_2e0b9f75-b068-4ba3-821c-18376fe5b9e9",
+        "event_type": "NEWS",
+        "symbol": "ADBE",
+        "timestamp": "2025-11-23T00:24:47.380523",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "ADBE_b019fc3e-dd0e-4f27-82e0-fa34f1707507",
+        "event_type": "NEWS",
+        "symbol": "ADBE",
+        "timestamp": "2025-11-23T00:24:47.380540",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "ADBE_e676b2e1-2ae9-4707-adac-7ff6f907c64d",
+        "event_type": "NEWS",
+        "symbol": "ADBE",
+        "timestamp": "2025-11-23T00:24:47.380559",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "ADBE_10a54c69-d3c9-4837-935d-106983f408a9",
+        "event_type": "NEWS",
+        "symbol": "ADBE",
+        "timestamp": "2025-11-23T00:24:47.380575",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "ADBE_266b1481-1462-489c-9d2a-21f4468b9742",
+        "event_type": "NEWS",
+        "symbol": "ADBE",
+        "timestamp": "2025-11-23T00:24:47.380592",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "ADBE_4e3908a3-aecd-4e4d-9a50-4d6a7c770295",
+        "event_type": "NEWS",
+        "symbol": "ADBE",
+        "timestamp": "2025-11-23T00:24:47.380608",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "ADBE_ed14d2fe-abb1-4216-b580-85039af59864",
+        "event_type": "NEWS",
+        "symbol": "ADBE",
+        "timestamp": "2025-11-23T00:24:47.380624",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      }
+    ]
+  },
+  "^GSPC": {
+    "last_updated": "2025-11-23T00:24:50.862759",
+    "articles": [
+      {
+        "event_id": "^GSPC_f5277c60-f322-4282-a74b-0e943f097124",
+        "event_type": "NEWS",
+        "symbol": "^GSPC",
+        "timestamp": "2025-11-23T00:24:50.861869",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "^GSPC_b50a7e8f-4310-43bc-b38a-a5492bd54af9",
+        "event_type": "NEWS",
+        "symbol": "^GSPC",
+        "timestamp": "2025-11-23T00:24:50.861923",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "^GSPC_f665ebe4-9b34-42fa-993e-e5464c15847e",
+        "event_type": "NEWS",
+        "symbol": "^GSPC",
+        "timestamp": "2025-11-23T00:24:50.861947",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "^GSPC_bf33a6e4-2a39-4441-be25-0cb16d47b598",
+        "event_type": "NEWS",
+        "symbol": "^GSPC",
+        "timestamp": "2025-11-23T00:24:50.861965",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "^GSPC_6d95cce3-49b9-4d21-ae0e-e3a979c9c901",
+        "event_type": "NEWS",
+        "symbol": "^GSPC",
+        "timestamp": "2025-11-23T00:24:50.861980",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "^GSPC_b05276ec-0631-4baf-9c45-ca6192e8af04",
+        "event_type": "NEWS",
+        "symbol": "^GSPC",
+        "timestamp": "2025-11-23T00:24:50.861993",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "^GSPC_12332a29-2e37-467f-9f3d-0ffecf6d6dbc",
+        "event_type": "NEWS",
+        "symbol": "^GSPC",
+        "timestamp": "2025-11-23T00:24:50.862009",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "^GSPC_cf4c5581-ba61-4850-ba48-eacae4100d83",
+        "event_type": "NEWS",
+        "symbol": "^GSPC",
+        "timestamp": "2025-11-23T00:24:50.862023",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "^GSPC_8ad9eaba-1dab-479c-80ad-7f84bb9e90fd",
+        "event_type": "NEWS",
+        "symbol": "^GSPC",
+        "timestamp": "2025-11-23T00:24:50.862037",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "^GSPC_35c4bb42-2865-4f50-8609-b0dcd3c11b07",
+        "event_type": "NEWS",
+        "symbol": "^GSPC",
+        "timestamp": "2025-11-23T00:24:50.862049",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      }
+    ]
+  },
+  "^DJI": {
+    "last_updated": "2025-11-23T00:24:52.046972",
+    "articles": [
+      {
+        "event_id": "^DJI_305ebd48-37c6-4421-a756-cb0919953df3",
+        "event_type": "NEWS",
+        "symbol": "^DJI",
+        "timestamp": "2025-11-23T00:24:52.046198",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "^DJI_ee817b23-a54c-4218-9610-ef493067bf4d",
+        "event_type": "NEWS",
+        "symbol": "^DJI",
+        "timestamp": "2025-11-23T00:24:52.046248",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "^DJI_b9c124b7-bd7c-4f16-9beb-2fe041d9fc00",
+        "event_type": "NEWS",
+        "symbol": "^DJI",
+        "timestamp": "2025-11-23T00:24:52.046268",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "^DJI_83e6ac94-561b-4a64-920c-d7ecfec1134b",
+        "event_type": "NEWS",
+        "symbol": "^DJI",
+        "timestamp": "2025-11-23T00:24:52.046283",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "^DJI_2f36e98b-2a2e-417f-8e42-cfd70ed6afb5",
+        "event_type": "NEWS",
+        "symbol": "^DJI",
+        "timestamp": "2025-11-23T00:24:52.046297",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "^DJI_4f705964-3655-4f26-9c96-6c9211ab8bc4",
+        "event_type": "NEWS",
+        "symbol": "^DJI",
+        "timestamp": "2025-11-23T00:24:52.046311",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "^DJI_c3376fb8-77a1-4905-83e1-bc93e67ba33b",
+        "event_type": "NEWS",
+        "symbol": "^DJI",
+        "timestamp": "2025-11-23T00:24:52.046325",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "^DJI_e529bb7e-3911-4777-88dd-fd53b66c8cec",
+        "event_type": "NEWS",
+        "symbol": "^DJI",
+        "timestamp": "2025-11-23T00:24:52.046340",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "^DJI_21c7fdfa-ef5f-4b7b-b90e-6d53e0c1fe04",
+        "event_type": "NEWS",
+        "symbol": "^DJI",
+        "timestamp": "2025-11-23T00:24:52.046353",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "^DJI_dc335565-2070-4b8f-a369-73b07d7aa621",
+        "event_type": "NEWS",
+        "symbol": "^DJI",
+        "timestamp": "2025-11-23T00:24:52.046367",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      }
+    ]
+  },
+  "CSCO": {
+    "last_updated": "2025-11-23T00:24:53.936056",
+    "articles": [
+      {
+        "event_id": "CSCO_38331b0a-a6d4-4e5f-aff1-af52f9d25286",
+        "event_type": "NEWS",
+        "symbol": "CSCO",
+        "timestamp": "2025-11-23T00:24:53.935401",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "CSCO_5dc8f819-52c4-4803-ae6a-2760c35edcb1",
+        "event_type": "NEWS",
+        "symbol": "CSCO",
+        "timestamp": "2025-11-23T00:24:53.935443",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "CSCO_2d44017c-c499-46e5-aca2-5642b5357b52",
+        "event_type": "NEWS",
+        "symbol": "CSCO",
+        "timestamp": "2025-11-23T00:24:53.935457",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "CSCO_e996620a-29df-40d5-9e61-5a65ca68f0e9",
+        "event_type": "NEWS",
+        "symbol": "CSCO",
+        "timestamp": "2025-11-23T00:24:53.935471",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "CSCO_57e6b571-b1fc-4c1c-bbb6-33f59fe88ce5",
+        "event_type": "NEWS",
+        "symbol": "CSCO",
+        "timestamp": "2025-11-23T00:24:53.935482",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "CSCO_fdc8339a-4714-48b4-8c62-79471ba21637",
+        "event_type": "NEWS",
+        "symbol": "CSCO",
+        "timestamp": "2025-11-23T00:24:53.935494",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "CSCO_abeec712-24ac-48ce-843d-211e75cf2742",
+        "event_type": "NEWS",
+        "symbol": "CSCO",
+        "timestamp": "2025-11-23T00:24:53.935505",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "CSCO_63fd55b3-65be-4401-8493-c9201ff35e57",
+        "event_type": "NEWS",
+        "symbol": "CSCO",
+        "timestamp": "2025-11-23T00:24:53.935520",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "CSCO_bf2da612-d697-41bb-98d6-42602fe7f530",
+        "event_type": "NEWS",
+        "symbol": "CSCO",
+        "timestamp": "2025-11-23T00:24:53.935535",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "CSCO_2697f36b-e5cb-4799-8aad-e727dd2c0f2b",
+        "event_type": "NEWS",
+        "symbol": "CSCO",
+        "timestamp": "2025-11-23T00:24:53.935546",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      }
+    ]
+  },
+  "^IXIC": {
+    "last_updated": "2025-11-23T00:24:55.765264",
+    "articles": [
+      {
+        "event_id": "^IXIC_ba87e8a6-d71f-4d86-9906-e5d6e05bcdcb",
+        "event_type": "NEWS",
+        "symbol": "^IXIC",
+        "timestamp": "2025-11-23T00:24:55.764196",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "^IXIC_d75a3c4a-fab7-47f4-bacf-743cad692157",
+        "event_type": "NEWS",
+        "symbol": "^IXIC",
+        "timestamp": "2025-11-23T00:24:55.764257",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "^IXIC_120b4fe3-cd9c-4791-a989-3bc598a7e1cd",
+        "event_type": "NEWS",
+        "symbol": "^IXIC",
+        "timestamp": "2025-11-23T00:24:55.764281",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "^IXIC_2e7dc4dd-de4e-4a68-8b56-290ad4c3a223",
+        "event_type": "NEWS",
+        "symbol": "^IXIC",
+        "timestamp": "2025-11-23T00:24:55.764300",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "^IXIC_9d77f370-61fd-46a5-a6dd-8b5ae31d9b20",
+        "event_type": "NEWS",
+        "symbol": "^IXIC",
+        "timestamp": "2025-11-23T00:24:55.764319",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "^IXIC_3e10958c-0f9e-4257-b622-504ded61b3dd",
+        "event_type": "NEWS",
+        "symbol": "^IXIC",
+        "timestamp": "2025-11-23T00:24:55.764337",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "^IXIC_5355420d-3eb5-45c3-9b11-57d51ee9b914",
+        "event_type": "NEWS",
+        "symbol": "^IXIC",
+        "timestamp": "2025-11-23T00:24:55.764355",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "^IXIC_71aabf2e-2bb8-42a1-92cb-f55e3741d0f2",
+        "event_type": "NEWS",
+        "symbol": "^IXIC",
+        "timestamp": "2025-11-23T00:24:55.764373",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "^IXIC_9b927bea-705e-4107-b7e3-197e4a537faa",
+        "event_type": "NEWS",
+        "symbol": "^IXIC",
+        "timestamp": "2025-11-23T00:24:55.764391",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "^IXIC_5c494ee2-767e-4935-b2d4-2114f4556e2e",
+        "event_type": "NEWS",
+        "symbol": "^IXIC",
+        "timestamp": "2025-11-23T00:24:55.764410",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      }
+    ]
+  },
+  "AMD": {
+    "last_updated": "2025-11-23T00:24:57.621545",
+    "articles": [
+      {
+        "event_id": "AMD_dac3ef87-ec6a-45bc-90df-fa8735f0daea",
+        "event_type": "NEWS",
+        "symbol": "AMD",
+        "timestamp": "2025-11-23T00:24:57.620498",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "AMD_9688a752-df0f-4734-8ccc-a949277c7335",
+        "event_type": "NEWS",
+        "symbol": "AMD",
+        "timestamp": "2025-11-23T00:24:57.620550",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "AMD_d8620acb-f7c0-444d-9420-895b314b6acc",
+        "event_type": "NEWS",
+        "symbol": "AMD",
+        "timestamp": "2025-11-23T00:24:57.620574",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "AMD_cc97e694-2060-43a3-a7e8-09641f9b9f5a",
+        "event_type": "NEWS",
+        "symbol": "AMD",
+        "timestamp": "2025-11-23T00:24:57.620595",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "AMD_8fce9981-3ddc-49ef-95b4-3d2f66f48335",
+        "event_type": "NEWS",
+        "symbol": "AMD",
+        "timestamp": "2025-11-23T00:24:57.620614",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "AMD_aef6c95a-89b8-47b3-b3e5-5af4a92418ca",
+        "event_type": "NEWS",
+        "symbol": "AMD",
+        "timestamp": "2025-11-23T00:24:57.620633",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "AMD_63c660c3-7ebb-455a-980b-6a3100bf5695",
+        "event_type": "NEWS",
+        "symbol": "AMD",
+        "timestamp": "2025-11-23T00:24:57.620651",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "AMD_4b083a26-a971-48ed-b986-391d469a8f7f",
+        "event_type": "NEWS",
+        "symbol": "AMD",
+        "timestamp": "2025-11-23T00:24:57.620669",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "AMD_bb475b91-d258-4698-a7db-bacfe7f80ede",
+        "event_type": "NEWS",
+        "symbol": "AMD",
+        "timestamp": "2025-11-23T00:24:57.620688",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "AMD_79c86476-3ef8-4131-9e7e-53c4ad1d7f91",
+        "event_type": "NEWS",
+        "symbol": "AMD",
+        "timestamp": "2025-11-23T00:24:57.620706",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      }
+    ]
+  },
+  "TSLA": {
+    "last_updated": "2025-11-23T00:29:45.355167",
+    "articles": [
+      {
+        "event_id": "TSLA_a869a3b3-4378-4c61-a057-460cb87dfe1d",
+        "event_type": "NEWS",
+        "symbol": "TSLA",
+        "timestamp": "2025-11-23T00:29:45.354471",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "TSLA_99443cde-f8ed-485f-b661-774f558ba8f2",
+        "event_type": "NEWS",
+        "symbol": "TSLA",
+        "timestamp": "2025-11-23T00:29:45.354517",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "TSLA_a8c9c858-6fbe-4b4e-abc2-60ba6ae5edd5",
+        "event_type": "NEWS",
+        "symbol": "TSLA",
+        "timestamp": "2025-11-23T00:29:45.354537",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "TSLA_46fc793e-0f6d-4d88-a1bc-b45bf091b217",
+        "event_type": "NEWS",
+        "symbol": "TSLA",
+        "timestamp": "2025-11-23T00:29:45.354548",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "TSLA_356438fb-2189-497c-b914-d79b979c42d0",
+        "event_type": "NEWS",
+        "symbol": "TSLA",
+        "timestamp": "2025-11-23T00:29:45.354557",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "TSLA_a6c25d47-e71d-4b6a-81ce-5bdc5c60f736",
+        "event_type": "NEWS",
+        "symbol": "TSLA",
+        "timestamp": "2025-11-23T00:29:45.354565",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "TSLA_5dd3a615-6405-4ebb-a4ed-1b2375a06e04",
+        "event_type": "NEWS",
+        "symbol": "TSLA",
+        "timestamp": "2025-11-23T00:29:45.354573",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "TSLA_382880f0-b32b-47cf-b7cb-c61d9fa9d996",
+        "event_type": "NEWS",
+        "symbol": "TSLA",
+        "timestamp": "2025-11-23T00:29:45.354580",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "TSLA_c01ead2d-d289-45b6-b19b-579ddfa4798f",
+        "event_type": "NEWS",
+        "symbol": "TSLA",
+        "timestamp": "2025-11-23T00:29:45.354588",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "TSLA_42bd5a3f-bbc9-4358-85d6-62d46e5df4d6",
+        "event_type": "NEWS",
+        "symbol": "TSLA",
+        "timestamp": "2025-11-23T00:29:45.354595",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      }
+    ]
+  },
+  "BAC": {
+    "last_updated": "2025-11-23T00:29:51.200960",
+    "articles": [
+      {
+        "event_id": "BAC_79d6a366-b48a-43e0-8759-19d7725a7cb0",
+        "event_type": "NEWS",
+        "symbol": "BAC",
+        "timestamp": "2025-11-23T00:29:51.199613",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "BAC_2750b637-a1be-4471-af24-826e66fb7649",
+        "event_type": "NEWS",
+        "symbol": "BAC",
+        "timestamp": "2025-11-23T00:29:51.199682",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "BAC_38fa7b45-5413-417e-9d3d-1f5f1ed64f34",
+        "event_type": "NEWS",
+        "symbol": "BAC",
+        "timestamp": "2025-11-23T00:29:51.199716",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "BAC_8bd6f883-8fe3-4a14-8c4d-18c45bdef8a8",
+        "event_type": "NEWS",
+        "symbol": "BAC",
+        "timestamp": "2025-11-23T00:29:51.199743",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "BAC_4f689123-cb65-4186-8581-8e76b84d68b6",
+        "event_type": "NEWS",
+        "symbol": "BAC",
+        "timestamp": "2025-11-23T00:29:51.199770",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "BAC_fc30f29a-871e-4aff-92af-be367a426eb5",
+        "event_type": "NEWS",
+        "symbol": "BAC",
+        "timestamp": "2025-11-23T00:29:51.199795",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "BAC_6767d56c-779f-4cd8-b4c9-ea1b46feec6e",
+        "event_type": "NEWS",
+        "symbol": "BAC",
+        "timestamp": "2025-11-23T00:29:51.199819",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "BAC_2b931fc6-d8b7-49a7-b8b2-124e4ba77c34",
+        "event_type": "NEWS",
+        "symbol": "BAC",
+        "timestamp": "2025-11-23T00:29:51.199843",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "BAC_307b7912-255a-4f2e-b91a-96fed9f49eaa",
+        "event_type": "NEWS",
+        "symbol": "BAC",
+        "timestamp": "2025-11-23T00:29:51.199919",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "BAC_2215304d-76e8-47f5-9383-14564868271c",
+        "event_type": "NEWS",
+        "symbol": "BAC",
+        "timestamp": "2025-11-23T00:29:51.199951",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      }
+    ]
+  },
+  "V": {
+    "last_updated": "2025-11-23T00:29:53.546809",
+    "articles": [
+      {
+        "event_id": "V_71db50e4-363d-45f3-9db5-19894c26df99",
+        "event_type": "NEWS",
+        "symbol": "V",
+        "timestamp": "2025-11-23T00:29:53.546020",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "V_662fb2f6-a4d0-4a95-957a-4d555772d195",
+        "event_type": "NEWS",
+        "symbol": "V",
+        "timestamp": "2025-11-23T00:29:53.546056",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "V_59b57993-0019-4610-b8b2-1cc917cb8ef2",
+        "event_type": "NEWS",
+        "symbol": "V",
+        "timestamp": "2025-11-23T00:29:53.546067",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "V_777835d1-9307-485c-81b4-9d85fca2cb48",
+        "event_type": "NEWS",
+        "symbol": "V",
+        "timestamp": "2025-11-23T00:29:53.546077",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "V_ac12dda1-8b8d-44b9-84bc-1e129dafc8e3",
+        "event_type": "NEWS",
+        "symbol": "V",
+        "timestamp": "2025-11-23T00:29:53.546084",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "V_4e4769ab-126f-4612-ad98-7af20ad67676",
+        "event_type": "NEWS",
+        "symbol": "V",
+        "timestamp": "2025-11-23T00:29:53.546092",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "V_ed93b2dc-75a4-4b23-9c27-80cdc569daf3",
+        "event_type": "NEWS",
+        "symbol": "V",
+        "timestamp": "2025-11-23T00:29:53.546100",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "V_0f314838-4ebe-473b-b685-4d30beda0de2",
+        "event_type": "NEWS",
+        "symbol": "V",
+        "timestamp": "2025-11-23T00:29:53.546108",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "V_11b16ad2-4100-4aef-ac53-973b995dd8a4",
+        "event_type": "NEWS",
+        "symbol": "V",
+        "timestamp": "2025-11-23T00:29:53.546116",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "V_92ebcdc6-6166-4d9b-a457-365309ba245c",
+        "event_type": "NEWS",
+        "symbol": "V",
+        "timestamp": "2025-11-23T00:29:53.546123",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      }
+    ]
+  },
+  "AMZN": {
+    "last_updated": "2025-11-23T00:29:56.710315",
+    "articles": [
+      {
+        "event_id": "AMZN_bc7343fa-6d3f-4503-ab49-df6f87a460c5",
+        "event_type": "NEWS",
+        "symbol": "AMZN",
+        "timestamp": "2025-11-23T00:29:56.709420",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "AMZN_64f3a648-7cda-4544-b01a-717704e275fe",
+        "event_type": "NEWS",
+        "symbol": "AMZN",
+        "timestamp": "2025-11-23T00:29:56.709462",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "AMZN_3d8eeb5f-b67c-4cc1-803e-3bbff7c77372",
+        "event_type": "NEWS",
+        "symbol": "AMZN",
+        "timestamp": "2025-11-23T00:29:56.709478",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "AMZN_6d08e352-ab0f-46a8-8fda-da6525355b5b",
+        "event_type": "NEWS",
+        "symbol": "AMZN",
+        "timestamp": "2025-11-23T00:29:56.709488",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "AMZN_bb11153a-947d-4531-8f40-256bf0143883",
+        "event_type": "NEWS",
+        "symbol": "AMZN",
+        "timestamp": "2025-11-23T00:29:56.709498",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "AMZN_91e2d818-03c2-4254-a1f6-c0cf6f8a3b13",
+        "event_type": "NEWS",
+        "symbol": "AMZN",
+        "timestamp": "2025-11-23T00:29:56.709507",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "AMZN_54ee5003-80a1-40bc-b3fa-db67114d2530",
+        "event_type": "NEWS",
+        "symbol": "AMZN",
+        "timestamp": "2025-11-23T00:29:56.709518",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "AMZN_568833bd-0fcb-40a3-a74c-e5ec77ecf385",
+        "event_type": "NEWS",
+        "symbol": "AMZN",
+        "timestamp": "2025-11-23T00:29:56.709527",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "AMZN_ed9eaa69-6202-4afa-9a10-c9ab6908e689",
+        "event_type": "NEWS",
+        "symbol": "AMZN",
+        "timestamp": "2025-11-23T00:29:56.709536",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "AMZN_9ee936e0-7842-4756-a2e5-29b7da7058d6",
+        "event_type": "NEWS",
+        "symbol": "AMZN",
+        "timestamp": "2025-11-23T00:29:56.709545",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      }
+    ]
+  },
+  "BRK-B": {
+    "last_updated": "2025-11-23T00:29:59.090469",
+    "articles": [
+      {
+        "event_id": "BRK-B_01ffa4f0-6ac0-45d3-a190-e00436b9d180",
+        "event_type": "NEWS",
+        "symbol": "BRK-B",
+        "timestamp": "2025-11-23T00:29:59.089662",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "BRK-B_15e4ef10-6869-4f6b-8026-0867630038f2",
+        "event_type": "NEWS",
+        "symbol": "BRK-B",
+        "timestamp": "2025-11-23T00:29:59.089701",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "BRK-B_18bf7b0c-eab6-499c-aaab-5689bed726dc",
+        "event_type": "NEWS",
+        "symbol": "BRK-B",
+        "timestamp": "2025-11-23T00:29:59.089714",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "BRK-B_5e429f28-c440-4ecd-8ef0-73cadf7dd49e",
+        "event_type": "NEWS",
+        "symbol": "BRK-B",
+        "timestamp": "2025-11-23T00:29:59.089723",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "BRK-B_708c9a11-beac-4bd3-b368-7d40396d4b1b",
+        "event_type": "NEWS",
+        "symbol": "BRK-B",
+        "timestamp": "2025-11-23T00:29:59.089731",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "BRK-B_7bef680d-4235-4321-a5ac-98e0dfc5a4c9",
+        "event_type": "NEWS",
+        "symbol": "BRK-B",
+        "timestamp": "2025-11-23T00:29:59.089739",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "BRK-B_c3e26ec3-51ad-4c52-b497-ca102c7e3bae",
+        "event_type": "NEWS",
+        "symbol": "BRK-B",
+        "timestamp": "2025-11-23T00:29:59.089747",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "BRK-B_206735b4-3675-45b2-baa2-b3cc96de4954",
+        "event_type": "NEWS",
+        "symbol": "BRK-B",
+        "timestamp": "2025-11-23T00:29:59.089755",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "BRK-B_d9b0938a-014e-4d0c-ba07-84be9f1fd6ee",
+        "event_type": "NEWS",
+        "symbol": "BRK-B",
+        "timestamp": "2025-11-23T00:29:59.089763",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "BRK-B_8b2d60ee-88d8-4550-866d-cbda95c3276b",
+        "event_type": "NEWS",
+        "symbol": "BRK-B",
+        "timestamp": "2025-11-23T00:29:59.089771",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      }
+    ]
+  },
+  "PYPL": {
+    "last_updated": "2025-11-23T00:30:22.855622",
+    "articles": [
+      {
+        "event_id": "PYPL_0191d38f-0f11-4a67-8149-521d4c06b110",
+        "event_type": "NEWS",
+        "symbol": "PYPL",
+        "timestamp": "2025-11-23T00:30:22.851849",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "PYPL_66e60385-dce2-4e96-a7d6-a35648bdcc69",
+        "event_type": "NEWS",
+        "symbol": "PYPL",
+        "timestamp": "2025-11-23T00:30:22.851996",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "PYPL_4c4afd4f-e6bd-4ed7-8e55-6af185044677",
+        "event_type": "NEWS",
+        "symbol": "PYPL",
+        "timestamp": "2025-11-23T00:30:22.852068",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "PYPL_b566c02c-84b6-4ebc-958c-e7a47c85cac1",
+        "event_type": "NEWS",
+        "symbol": "PYPL",
+        "timestamp": "2025-11-23T00:30:22.852131",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "PYPL_e7ffb9e9-b595-4aec-8522-3b011c1719d7",
+        "event_type": "NEWS",
+        "symbol": "PYPL",
+        "timestamp": "2025-11-23T00:30:22.852188",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "PYPL_b6b8cbdf-66d8-4697-b878-ede4de255c66",
+        "event_type": "NEWS",
+        "symbol": "PYPL",
+        "timestamp": "2025-11-23T00:30:22.852242",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "PYPL_12b37e58-b132-4e03-b900-5fa38a152e87",
+        "event_type": "NEWS",
+        "symbol": "PYPL",
+        "timestamp": "2025-11-23T00:30:22.852298",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "PYPL_aa2c71ad-e018-4752-bae1-8a6baf083af8",
+        "event_type": "NEWS",
+        "symbol": "PYPL",
+        "timestamp": "2025-11-23T00:30:22.852352",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "PYPL_210129da-0f9b-420f-b29a-4ee8c119ffbc",
+        "event_type": "NEWS",
+        "symbol": "PYPL",
+        "timestamp": "2025-11-23T00:30:22.852408",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "PYPL_588ea248-1868-413b-bbf5-7ba126745019",
+        "event_type": "NEWS",
+        "symbol": "PYPL",
+        "timestamp": "2025-11-23T00:30:22.852461",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      }
+    ]
+  },
+  "JPM": {
+    "last_updated": "2025-11-23T00:30:56.128129",
+    "articles": [
+      {
+        "event_id": "JPM_6e74d888-897a-48a4-b138-2368cb83dd97",
+        "event_type": "NEWS",
+        "symbol": "JPM",
+        "timestamp": "2025-11-23T00:30:56.126472",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "JPM_ff28fa82-1c3f-4ba2-85f5-e6152a870d14",
+        "event_type": "NEWS",
+        "symbol": "JPM",
+        "timestamp": "2025-11-23T00:30:56.126528",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "JPM_afa9f195-7c09-4a23-927d-babea1c9def2",
+        "event_type": "NEWS",
+        "symbol": "JPM",
+        "timestamp": "2025-11-23T00:30:56.126552",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "JPM_54c577dc-cf92-49b8-b876-d5af422d7cd4",
+        "event_type": "NEWS",
+        "symbol": "JPM",
+        "timestamp": "2025-11-23T00:30:56.126572",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "JPM_9d21d547-5065-4e93-8a71-d41a6ce52c3b",
+        "event_type": "NEWS",
+        "symbol": "JPM",
+        "timestamp": "2025-11-23T00:30:56.126592",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "JPM_1ed35539-712c-4829-bed9-147bcdec9ba6",
+        "event_type": "NEWS",
+        "symbol": "JPM",
+        "timestamp": "2025-11-23T00:30:56.126614",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "JPM_d9992494-e584-468f-bc4a-194050ddb5c8",
+        "event_type": "NEWS",
+        "symbol": "JPM",
+        "timestamp": "2025-11-23T00:30:56.126635",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "JPM_0cf03a62-15ab-4ca5-8da3-93d62f9879a2",
+        "event_type": "NEWS",
+        "symbol": "JPM",
+        "timestamp": "2025-11-23T00:30:56.126655",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "JPM_baf9da0e-e9eb-4da5-8a77-5513581d8f8b",
+        "event_type": "NEWS",
+        "symbol": "JPM",
+        "timestamp": "2025-11-23T00:30:56.126674",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "JPM_5e04e91b-8390-442d-acb4-e8f9055fb0fd",
+        "event_type": "NEWS",
+        "symbol": "JPM",
+        "timestamp": "2025-11-23T00:30:56.126694",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      }
+    ]
+  },
+  "MA": {
+    "last_updated": "2025-11-23T00:31:46.666106",
+    "articles": [
+      {
+        "event_id": "MA_fb3073de-1761-455e-83af-a5ec1fe8d800",
+        "event_type": "NEWS",
+        "symbol": "MA",
+        "timestamp": "2025-11-23T00:31:46.662777",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "MA_b9714389-e4ca-4e12-bbeb-dd60713adb83",
+        "event_type": "NEWS",
+        "symbol": "MA",
+        "timestamp": "2025-11-23T00:31:46.662918",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "MA_d91605ce-2848-421e-9fd1-ea45d14829f0",
+        "event_type": "NEWS",
+        "symbol": "MA",
+        "timestamp": "2025-11-23T00:31:46.662969",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "MA_737f49b9-e6bf-4a87-8ecc-7a23b377d41e",
+        "event_type": "NEWS",
+        "symbol": "MA",
+        "timestamp": "2025-11-23T00:31:46.663006",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "MA_94a96db6-5322-4466-a673-74552ac126a6",
+        "event_type": "NEWS",
+        "symbol": "MA",
+        "timestamp": "2025-11-23T00:31:46.663038",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "MA_8abbe90f-84ae-4ce7-bb71-3620b1aa27a6",
+        "event_type": "NEWS",
+        "symbol": "MA",
+        "timestamp": "2025-11-23T00:31:46.663069",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "MA_d980633e-adb8-400f-933a-2c10ac550930",
+        "event_type": "NEWS",
+        "symbol": "MA",
+        "timestamp": "2025-11-23T00:31:46.663099",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "MA_915834fd-64a2-4f0c-95e3-2cee36188a34",
+        "event_type": "NEWS",
+        "symbol": "MA",
+        "timestamp": "2025-11-23T00:31:46.663128",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "MA_da7803b8-0619-4b13-92d5-8356d755a721",
+        "event_type": "NEWS",
+        "symbol": "MA",
+        "timestamp": "2025-11-23T00:31:46.663157",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "MA_e15e0e30-351f-4de5-86ef-da97a627dc6d",
+        "event_type": "NEWS",
+        "symbol": "MA",
+        "timestamp": "2025-11-23T00:31:46.663189",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      }
+    ]
+  },
+  "INTC": {
+    "last_updated": "2025-11-23T00:32:38.616744",
+    "articles": [
+      {
+        "event_id": "INTC_f2a2a769-ddb0-4fe2-8b3a-61a247aa9f14",
+        "event_type": "NEWS",
+        "symbol": "INTC",
+        "timestamp": "2025-11-23T00:32:38.615245",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "INTC_929b8102-18cd-4ffe-bf5f-f7afe5455247",
+        "event_type": "NEWS",
+        "symbol": "INTC",
+        "timestamp": "2025-11-23T00:32:38.615286",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "INTC_e0d7e4f8-4472-42ed-adaa-db326bcc38f8",
+        "event_type": "NEWS",
+        "symbol": "INTC",
+        "timestamp": "2025-11-23T00:32:38.615301",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "INTC_78e30c79-609b-4f8c-9666-673b06dcb112",
+        "event_type": "NEWS",
+        "symbol": "INTC",
+        "timestamp": "2025-11-23T00:32:38.615313",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "INTC_822ff707-9054-4f4c-a732-27fc37231f42",
+        "event_type": "NEWS",
+        "symbol": "INTC",
+        "timestamp": "2025-11-23T00:32:38.615325",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "INTC_09e130ca-9a70-40d9-a870-8f49894d95f8",
+        "event_type": "NEWS",
+        "symbol": "INTC",
+        "timestamp": "2025-11-23T00:32:38.615336",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "INTC_d244c84f-f998-47bf-8828-f7a2fc2c3289",
+        "event_type": "NEWS",
+        "symbol": "INTC",
+        "timestamp": "2025-11-23T00:32:38.615350",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "INTC_7830e4ee-2a80-4406-b4c2-4e2f3f2c8b84",
+        "event_type": "NEWS",
+        "symbol": "INTC",
+        "timestamp": "2025-11-23T00:32:38.615361",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "INTC_1949bc0b-6a88-4f74-964c-c7ce38e658dc",
+        "event_type": "NEWS",
+        "symbol": "INTC",
+        "timestamp": "2025-11-23T00:32:38.615372",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "INTC_38871e4f-0d8f-40ba-82cf-7dcde4fa343e",
+        "event_type": "NEWS",
+        "symbol": "INTC",
+        "timestamp": "2025-11-23T00:32:38.615383",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      }
+    ]
+  },
+  "CRM": {
+    "last_updated": "2025-11-23T00:33:14.779310",
+    "articles": [
+      {
+        "event_id": "CRM_720b044f-fdff-4efc-bc66-1ad0352694e0",
+        "event_type": "NEWS",
+        "symbol": "CRM",
+        "timestamp": "2025-11-23T00:33:14.777574",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "CRM_89cc9865-8f26-4a2f-ad84-4d9369ca9042",
+        "event_type": "NEWS",
+        "symbol": "CRM",
+        "timestamp": "2025-11-23T00:33:14.777638",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "CRM_3b51c650-845d-4d51-9660-9be757102f1b",
+        "event_type": "NEWS",
+        "symbol": "CRM",
+        "timestamp": "2025-11-23T00:33:14.777675",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "CRM_9e7c1825-3cbf-4520-8846-19273f307a6d",
+        "event_type": "NEWS",
+        "symbol": "CRM",
+        "timestamp": "2025-11-23T00:33:14.777699",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "CRM_132b5ec2-f80f-4122-b619-007d13839807",
+        "event_type": "NEWS",
+        "symbol": "CRM",
+        "timestamp": "2025-11-23T00:33:14.777726",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "CRM_185279d7-ccaa-43a5-bedb-ac93baab569c",
+        "event_type": "NEWS",
+        "symbol": "CRM",
+        "timestamp": "2025-11-23T00:33:14.777745",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "CRM_1a302c0b-e070-494c-bb2b-13babc676101",
+        "event_type": "NEWS",
+        "symbol": "CRM",
+        "timestamp": "2025-11-23T00:33:14.777765",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "CRM_9bf34f81-214a-4586-9335-46761ae99fb0",
+        "event_type": "NEWS",
+        "symbol": "CRM",
+        "timestamp": "2025-11-23T00:33:14.777783",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "CRM_7ea863a9-35e5-4801-9453-f92956241e70",
+        "event_type": "NEWS",
+        "symbol": "CRM",
+        "timestamp": "2025-11-23T00:33:14.777801",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "CRM_43ed8ed7-2ec1-422f-b0ee-302db61e2cb7",
+        "event_type": "NEWS",
+        "symbol": "CRM",
+        "timestamp": "2025-11-23T00:33:14.777818",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      }
+    ]
+  },
+  "NFLX": {
+    "last_updated": "2025-11-23T00:39:39.890386",
+    "articles": [
+      {
+        "event_id": "NFLX_9e35e983-3c9c-4582-bbcc-872bebc65a79",
+        "event_type": "NEWS",
+        "symbol": "NFLX",
+        "timestamp": "2025-11-23T00:39:39.888740",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "NFLX_e04700b3-7555-485c-a462-af9d12940440",
+        "event_type": "NEWS",
+        "symbol": "NFLX",
+        "timestamp": "2025-11-23T00:39:39.888800",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "NFLX_81dfa592-4c32-4091-be84-c4df717340b3",
+        "event_type": "NEWS",
+        "symbol": "NFLX",
+        "timestamp": "2025-11-23T00:39:39.888824",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "NFLX_38f7201f-f9ac-46f7-a2d7-56419fa63be3",
+        "event_type": "NEWS",
+        "symbol": "NFLX",
+        "timestamp": "2025-11-23T00:39:39.888839",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "NFLX_90b75791-5b14-49e6-aeef-ce062336fc01",
+        "event_type": "NEWS",
+        "symbol": "NFLX",
+        "timestamp": "2025-11-23T00:39:39.888851",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "NFLX_c59126fd-f512-438f-91c4-220fd3372d8b",
+        "event_type": "NEWS",
+        "symbol": "NFLX",
+        "timestamp": "2025-11-23T00:39:39.888863",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "NFLX_c794ff00-504a-456c-9259-1bfe0fad09f5",
+        "event_type": "NEWS",
+        "symbol": "NFLX",
+        "timestamp": "2025-11-23T00:39:39.888875",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "NFLX_d2e8f691-72b3-4432-9dfd-0ef4b88d827c",
+        "event_type": "NEWS",
+        "symbol": "NFLX",
+        "timestamp": "2025-11-23T00:39:39.888885",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "NFLX_0e69e3d9-3751-42c9-b3e6-53df97fc54c7",
+        "event_type": "NEWS",
+        "symbol": "NFLX",
+        "timestamp": "2025-11-23T00:39:39.888896",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "NFLX_ca458942-a9b1-4eaf-a296-5050c46c5212",
+        "event_type": "NEWS",
+        "symbol": "NFLX",
+        "timestamp": "2025-11-23T00:39:39.888906",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      }
+    ]
+  },
+  "PG": {
+    "last_updated": "2025-11-23T00:46:04.554046",
+    "articles": [
+      {
+        "event_id": "PG_c122d6ce-8f17-4292-8162-462bf85a6e84",
+        "event_type": "NEWS",
+        "symbol": "PG",
+        "timestamp": "2025-11-23T00:46:04.552289",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "PG_5de47ed4-67f9-446d-a186-6e3aba9ea623",
+        "event_type": "NEWS",
+        "symbol": "PG",
+        "timestamp": "2025-11-23T00:46:04.552360",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "PG_16a458bc-c923-4a36-8858-a97a5f72e178",
+        "event_type": "NEWS",
+        "symbol": "PG",
+        "timestamp": "2025-11-23T00:46:04.552392",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "PG_5ed1af3e-8fe1-4ea5-bf46-c42a9dcf7e96",
+        "event_type": "NEWS",
+        "symbol": "PG",
+        "timestamp": "2025-11-23T00:46:04.552412",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "PG_7f8e3c2a-2b35-4ba4-849f-d6b02c0932b0",
+        "event_type": "NEWS",
+        "symbol": "PG",
+        "timestamp": "2025-11-23T00:46:04.552431",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "PG_937dbd7a-a19b-4486-8939-919492825dce",
+        "event_type": "NEWS",
+        "symbol": "PG",
+        "timestamp": "2025-11-23T00:46:04.552452",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "PG_de014ded-c7f5-428d-bcc0-994446b1c9f9",
+        "event_type": "NEWS",
+        "symbol": "PG",
+        "timestamp": "2025-11-23T00:46:04.552470",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "PG_7443403e-c216-4006-98c5-bc9f917a6799",
+        "event_type": "NEWS",
+        "symbol": "PG",
+        "timestamp": "2025-11-23T00:46:04.552487",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "PG_e9a44820-da92-4a82-8d84-929985f3cb19",
+        "event_type": "NEWS",
+        "symbol": "PG",
+        "timestamp": "2025-11-23T00:46:04.552506",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "PG_9bd3a837-1fb2-43f2-b97a-5fba49d8b6f8",
+        "event_type": "NEWS",
+        "symbol": "PG",
+        "timestamp": "2025-11-23T00:46:04.552523",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      }
+    ]
+  }
+}

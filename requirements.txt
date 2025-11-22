@@ -1,4 +1,7 @@
 PySide6
 yfinance
 matplotlib
-
+pandas-ta
+requests
+python-dateutil
+pytz

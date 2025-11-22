@@ -94,12 +94,15 @@ class MainWindow(QMainWindow):
         # Page 3: Talking Points
         self.talking_points_view = ui_components.TalkingPointsView()
         self.talking_points_view.back_clicked.connect(self.show_dashboard)
-        self.talking_points_view.ticker_selected.connect(self.show_detailed_view)
+        self.talking_points_view.ticker_selected.connect(self.show_detail)
         self.stack.addWidget(self.talking_points_view)
         
         # Page 4: Settings
         self.settings_view = ui_components.SettingsView()
+        self.settings_view.risk_profile_changed.connect(self.on_risk_profile_changed)
         self.stack.addWidget(self.settings_view)
+        
+        self.current_risk_profile = "BALANCED"
         
         # Timer
         self.timer = QTimer()
@@ -212,6 +215,10 @@ class MainWindow(QMainWindow):
         
         self.indices_card = self.create_card("Market Indices", "marketIndices")
         col1.addWidget(self.indices_card)
+        
+        # Market News (New)
+        self.market_news_card = ui_components.MarketNewsWidget()
+        col1.addWidget(self.market_news_card)
         
         self.watchlist_card = self.create_watchlist_card()
         col1.addWidget(self.watchlist_card)
@@ -482,7 +489,6 @@ class MainWindow(QMainWindow):
         self.refresh_indices()
         self.refresh_watchlist()
         self.refresh_performers()
-        self.refresh_talking_points()
         self.update_last_update_time()
 
     def refresh_indices(self):
@@ -530,17 +536,7 @@ class MainWindow(QMainWindow):
             card.clicked.connect(lambda s=data['symbol']: self.show_detail(s))
             worst_layout.addWidget(card)
 
-    def refresh_talking_points(self):
-        self.clear_layout(self.talking_points_card.findChild(QVBoxLayout, "talkingPoints_content"))
-        layout = self.talking_points_card.findChild(QVBoxLayout, "talkingPoints_content")
-        
-        points = data_service.get_talking_points()
-        
-        for point in points[:4]:
-            label = QLabel(f"▸ {point}")
-            label.setStyleSheet(f"color: {styles.COLORS['text_primary']}; padding: 5px;")
-            label.setWordWrap(True)
-            layout.addWidget(label)
+
 
     def update_last_update_time(self):
         from datetime import datetime
@@ -595,15 +591,20 @@ class MainWindow(QMainWindow):
         self.stack.setCurrentWidget(self.settings_view)
         self.update_sidebar_state("Settings")
 
-    def show_detailed_view(self, symbol):
-        # Fetch data for symbol
-        data = data_service.fetch_stock_data(symbol)
-        self.detail_view.set_data(data)
-        self.stack.setCurrentWidget(self.detail_view)
-        # Update sidebar state to nothing or keep current? 
-        # Maybe keep "Talking Points" active if we came from there, or "Dashboard" if from there.
-        # For now, let's just switch view.
+    def on_risk_profile_changed(self, profile):
+        self.current_risk_profile = profile
+        self.refresh_talking_points()
         
+    def refresh_talking_points(self):
+        # 1. Update Morning Espresso
+        narrative_tokens = data_service.get_morning_espresso_narrative()
+        self.talking_points_view.espresso.set_data(narrative_tokens)
+        
+        # 2. Update Opportunities based on Risk Profile
+        # 2. Update Opportunities based on Risk Profile
+        # The view handles fetching based on profile
+        self.talking_points_view.refresh_opportunities(self.current_risk_profile)
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MainWindow()

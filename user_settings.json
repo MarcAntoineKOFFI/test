@@ -1,0 +1,8 @@
+{
+  "risk_profile": "BALANCED",
+  "dark_mode": true,
+  "notifications": true,
+  "rvol_threshold": 1.0,
+  "coverage_sectors": [],
+  "client_tiers": {}
+}

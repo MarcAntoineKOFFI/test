@@ -1,8 +1,15 @@
+import json
+import os
+import uuid
 import yfinance as yf
 import random
 import datetime
 import time
 from enum import Enum
+import pytz
+from datetime import datetime, timedelta
+import pandas as pd
+import numpy as np
 
 # --- Narrative Engine Types ---
 class TokenType(Enum):
@@ -52,7 +59,7 @@ STOCK_NAMES = {
     'PYPL': 'PayPal Holdings Inc.', 'CSCO': 'Cisco Systems Inc.', 'PFE': 'Pfizer Inc.'
 }
 
-def fetch_stock_data(symbol):
+def fetch_stock_data(symbol, period="1mo", interval="1d"):
     """
     Fetches stock data using yfinance, falling back to mock data if it fails.
     Includes history for sparklines.
@@ -73,8 +80,10 @@ def fetch_stock_data(symbol):
         
         # Fetch history for sparkline (last 30 points)
         # Optimization: For a real app, we might cache this or fetch less frequently
-        history = ticker.history(period="1mo", interval="1d")
+        history = ticker.history(period=period, interval=interval)
         history_prices = history['Close'].tolist() if not history.empty else []
+        # Convert timestamps to string or unix timestamp
+        history_dates = [dt.strftime("%Y-%m-%d") for dt in history.index] if not history.empty else []
         
         name = STOCK_NAMES.get(symbol, symbol)
         
@@ -85,6 +94,7 @@ def fetch_stock_data(symbol):
             'change_percent': change_percent,
             'name': name,
             'history': history_prices,
+            'history_dates': history_dates,
             'timestamps': ['10:00 AM', '10:30 AM', '11:00 AM', '11:30 AM', '12:00 PM', '12:30 PM', '1:00 PM', '1:30 PM', '2:00 PM', '2:30 PM', '3:00 PM', '3:30 PM', '4:00 PM'],
             'rvol': random.uniform(0.5, 3.0),
             'open': info.open if info.open else price,
@@ -112,7 +122,7 @@ def generate_mock_data(symbol):
     variation = (random.random() - 0.5) * 0.1 
     price = base_price * (1 + variation)
     
-    time_variation = (datetime.datetime.now().minute / 60) - 0.5
+    time_variation = (datetime.now().minute / 60) - 0.5
     change_percent = time_variation * 6 
     change = price * (change_percent / 100)
     
@@ -131,6 +141,7 @@ def generate_mock_data(symbol):
         'change_percent': change_percent,
         'name': STOCK_NAMES.get(symbol, symbol),
         'history': history,
+        'history_dates': [(datetime.datetime.now() - datetime.timedelta(days=30-i)).strftime("%Y-%m-%d") for i in range(31)],
         'timestamps': ['9:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00'],
         'rvol': random.uniform(0.5, 3.0),
         'open': base_price * (1 + (random.random() - 0.5) * 0.02),
@@ -165,10 +176,28 @@ def get_top_gainers_losers():
     return gainers, losers
 
 def get_talking_points():
-    """Legacy function, kept for compatibility if needed, but new UI uses specific providers."""
+    """
+    Fetches real news headlines from yfinance for major tickers.
+    """
     points = []
-    points.append('Market is currently open - Live trading in progress')
-    points.append('Monitor earnings reports and Federal Reserve announcements')
+    try:
+        # Fetch news for a major index or popular stock
+        ticker = yf.Ticker("SPY") 
+        news = ticker.news
+        
+        if news:
+            for item in news[:4]:
+                title = item.get('title', '')
+                if title:
+                    points.append(title)
+        else:
+             points.append('Market is currently open - Live trading in progress')
+             points.append('Monitor earnings reports and Federal Reserve announcements')
+
+    except Exception:
+        points.append('Market is currently open - Live trading in progress')
+        points.append('Monitor earnings reports and Federal Reserve announcements')
+        
     return points
 
 def get_trader_skills():
@@ -206,141 +235,809 @@ def get_rationale(symbol):
 
 # --- Narrative Engine Logic ---
 
-def generate_narrative(symbol):
+def calculate_real_indicators(symbol):
     """
-    Generates a structured narrative based on mock technical/fundamental data.
-    Returns a list of NarrativeToken dicts.
+    Calculates real technical indicators using pandas (Manual implementation).
+    Returns a dictionary of indicators or None if calculation fails.
     """
-    # Mock Data Derivation
-    rvol = random.uniform(0.8, 3.5)
-    rsi = random.uniform(20, 80)
-    sma_50_diff = random.uniform(-5, 10) # Percent above/below SMA 50
+    try:
+        ticker = yf.Ticker(symbol)
+        # Fetch 6 months to ensure enough data for indicators (e.g. 50 SMA)
+        df = ticker.history(period="6mo", interval="1d")
+        
+        if df.empty or len(df) < 50:
+            return None
+            
+        close = df['Close']
+        
+        # --- RSI (14) ---
+        delta = close.diff()
+        gain = (delta.where(delta > 0, 0)).rolling(window=14).mean()
+        loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean()
+        rs = gain / loss
+        df['RSI'] = 100 - (100 / (1 + rs))
+        # Fix division by zero or initial NaNs if needed, but rolling mean handles it mostly.
+        # Better RSI calculation (Wilder's Smoothing) is standard but simple rolling is okay for now.
+        # Let's use Exponential Moving Average for RSI to be closer to standard? 
+        # Actually, standard RSI uses Wilder's smoothing.
+        # Simple implementation:
+        delta = close.diff()
+        up = delta.clip(lower=0)
+        down = -1 * delta.clip(upper=0)
+        ema_up = up.ewm(com=13, adjust=False).mean()
+        ema_down = down.ewm(com=13, adjust=False).mean()
+        rs = ema_up / ema_down
+        df['RSI'] = 100 - (100 / (1 + rs))
+
+        # --- MACD (12, 26, 9) ---
+        exp1 = close.ewm(span=12, adjust=False).mean()
+        exp2 = close.ewm(span=26, adjust=False).mean()
+        df['MACD'] = exp1 - exp2
+        df['MACD_SIGNAL'] = df['MACD'].ewm(span=9, adjust=False).mean()
+        
+        # --- Bollinger Bands (20, 2) ---
+        df['BBM'] = close.rolling(window=20).mean()
+        df['STD'] = close.rolling(window=20).std()
+        df['BBU'] = df['BBM'] + (df['STD'] * 2)
+        df['BBL'] = df['BBM'] - (df['STD'] * 2)
+        
+        # --- RVOL (Volume / 20-day MA Volume) ---
+        df['Vol_MA'] = df['Volume'].rolling(window=20).mean()
+        df['RVOL'] = df['Volume'] / df['Vol_MA']
+        
+        # --- 50 SMA ---
+        df['SMA_50'] = close.rolling(window=50).mean()
+        
+        # Get last row
+        last = df.iloc[-1]
+        
+        indicators = {
+            'rsi': round(last['RSI'], 2) if pd.notna(last['RSI']) else 50.0,
+            'macd': round(last['MACD'], 2) if pd.notna(last.get('MACD')) else 0.0,
+            'macd_signal': round(last['MACD_SIGNAL'], 2) if pd.notna(last.get('MACD_SIGNAL')) else 0.0,
+            'bb_upper': round(last['BBU'], 2) if pd.notna(last.get('BBU')) else 0.0,
+            'bb_lower': round(last['BBL'], 2) if pd.notna(last.get('BBL')) else 0.0,
+            'bb_middle': round(last['BBM'], 2) if pd.notna(last.get('BBM')) else 0.0,
+            'price': round(last['Close'], 2),
+            'rvol': round(last['RVOL'], 2) if pd.notna(last['RVOL']) else 1.0,
+            'sma_50': round(last['SMA_50'], 2) if pd.notna(last['SMA_50']) else 0.0,
+            'volume': int(last['Volume'])
+        }
+        
+        # Distance from SMA
+        if indicators['sma_50'] > 0:
+            indicators['sma_50_distance'] = round(((indicators['price'] - indicators['sma_50']) / indicators['sma_50']) * 100, 2)
+        else:
+            indicators['sma_50_distance'] = 0.0
+            
+        return indicators
+        
+    except Exception as e:
+        print(f"Error calculating indicators for {symbol}: {e}")
+        return None
+
+def calculate_setup_confidence(indicators):
+    """
+    Calculates a confidence score (50-98) based on technical confluence.
+    """
+    score = 50
     
+    rsi = indicators['rsi']
+    macd = indicators['macd']
+    signal = indicators['macd_signal']
+    price = indicators['price']
+    bbu = indicators['bb_upper']
+    bbl = indicators['bb_lower']
+    bbm = indicators['bb_middle']
+    rvol = indicators['rvol']
+    
+    # RSI Logic
+    if 30 <= rsi <= 70:
+        score += 10
+    elif rsi < 30:
+        score += 15 # Oversold bounce potential
+    elif rsi > 70:
+        score -= 10 # Overbought risk
+        
+    # MACD Logic
+    if macd > signal:
+        score += 10
+    else:
+        score -= 5
+        
+    # Bollinger Bands
+    if price > bbu:
+        score -= 15 # Overextended
+    elif bbm < price <= bbu:
+        score += 5 # Uptrending
+    elif bbl <= price <= bbm:
+        score += 5 # Support zone
+    elif price < bbl:
+        score += 10 # Oversold extreme
+        
+    # RVOL
+    if rvol > 2.0:
+        score += 5 # Extra bonus for very high volume
+    if rvol > 1.5:
+        score += 10
+    elif rvol < 0.8:
+        score -= 5
+        
+    # Bounds
+    score = max(50, min(98, score))
+    return int(score)
+
+def calculate_atr(symbol, period=14):
+    """Calculates Average True Range."""
+    try:
+        ticker = yf.Ticker(symbol)
+        # Fetch enough data for 14 period ATR
+        df = ticker.history(period="1mo", interval="1d")
+        if df.empty:
+            return 1.0
+            
+        high_low = df['High'] - df['Low']
+        high_close = (df['High'] - df['Close'].shift()).abs()
+        low_close = (df['Low'] - df['Close'].shift()).abs()
+        
+        ranges = pd.concat([high_low, high_close, low_close], axis=1)
+        true_range = ranges.max(axis=1)
+        atr = true_range.rolling(window=period).mean().iloc[-1]
+        
+        return atr if pd.notna(atr) else 1.0
+    except:
+        return 1.0
+
+# --- Symbol to Sector Mapping ---
+SYMBOL_TO_SECTOR = {
+    'AAPL': 'XLK', 'MSFT': 'XLK', 'NVDA': 'XLK', 'AMD': 'XLK', 'ADBE': 'XLK', 'CRM': 'XLK', 'CSCO': 'XLK', 'INTC': 'XLK',
+    'GOOGL': 'XLC', 'META': 'XLC', 'NFLX': 'XLC', 'DIS': 'XLC',
+    'AMZN': 'XLY', 'TSLA': 'XLY', 'HD': 'XLY', 'MCD': 'XLY', 'NKE': 'XLY',
+    'JPM': 'XLF', 'BAC': 'XLF', 'V': 'XLF', 'MA': 'XLF', 'BRK-B': 'XLF',
+    'UNH': 'XLV', 'JNJ': 'XLV', 'PFE': 'XLV', 'LLY': 'XLV', 'MRK': 'XLV',
+    'XOM': 'XLE', 'CVX': 'XLE',
+    'PG': 'XLP', 'WMT': 'XLP', 'KO': 'XLP', 'PEP': 'XLP',
+    'BA': 'XLI', 'CAT': 'XLI', 'GE': 'XLI', 'HON': 'XLI',
+    'LIN': 'XLB', 'SHW': 'XLB',
+    'NEE': 'XLU', 'DUK': 'XLU'
+}
+
+def generate_narrative(symbol, indicators=None):
+    """
+    Generates a narrative based on REAL technical indicators.
+    """
+    if indicators is None:
+        indicators = calculate_real_indicators(symbol)
+        if indicators is None:
+            return [{'content': "Data unavailable", 'type': TokenType.CONTEXT.value, 'sentiment': Sentiment.NEUTRAL.value}]
+
     tokens = []
     
-    # 1. Catalyst Check (Mock Calendar)
-    # Randomly assign a catalyst to some stocks
-    if random.random() < 0.2:
-        catalyst_type = random.choice(["EARNINGS BEAT", "FDA APPROVAL", "M&A RUMOR", "GUIDANCE RAISE"])
-        tokens.append({'content': "SURGE", 'type': TokenType.ACTION.value, 'sentiment': Sentiment.BULLISH.value})
-        tokens.append({'content': "driven by", 'type': TokenType.CONTEXT.value, 'sentiment': Sentiment.NEUTRAL.value})
-        tokens.append({'content': catalyst_type, 'type': TokenType.CATALYST.value, 'sentiment': Sentiment.BULLISH.value, 'meta': {'headline': f"{symbol} Reports Strong Q3 Results", 'source': "Reuters", 'time': "08:30 AM"}})
-        return tokens
-
-    # 2. Momentum Logic
-    if rvol > 2.0 and sma_50_diff > 0:
+    # Extract real metrics
+    rvol = indicators['rvol']
+    rsi = indicators['rsi']
+    sma_dist = indicators['sma_50_distance']
+    price = indicators['price']
+    sma_50 = indicators['sma_50']
+    
+    # 1. Institutional Action (High RVOL)
+    if rvol > 1.5:
         tokens.append({'content': "INSTITUTIONAL ACCUMULATION", 'type': TokenType.ACTION.value, 'sentiment': Sentiment.BULLISH.value})
-        tokens.append({'content': "detected;", 'type': TokenType.CONTEXT.value, 'sentiment': Sentiment.NEUTRAL.value})
-        tokens.append({'content': f"volume is {rvol:.1f}x average", 'type': TokenType.EVIDENCE.value, 'sentiment': Sentiment.BULLISH.value})
-        tokens.append({'content': ", confirming breakout.", 'type': TokenType.CONTEXT.value, 'sentiment': Sentiment.NEUTRAL.value})
-        return tokens
+        tokens.append({'content': f"detected; volume is {rvol}x average,", 'type': TokenType.EVIDENCE.value, 'sentiment': Sentiment.BULLISH.value})
         
-    # 3. Mean Reversion (Oversold)
-    if rsi < 30:
-        tokens.append({'content': "TECHNICAL CAPITULATION", 'type': TokenType.ACTION.value, 'sentiment': Sentiment.BULLISH.value})
-        tokens.append({'content': "offers entry;", 'type': TokenType.CONTEXT.value, 'sentiment': Sentiment.NEUTRAL.value})
-        tokens.append({'content': f"Oversold RSI ({int(rsi)})", 'type': TokenType.EVIDENCE.value, 'sentiment': Sentiment.BULLISH.value})
-        tokens.append({'content': "at support.", 'type': TokenType.CONTEXT.value, 'sentiment': Sentiment.NEUTRAL.value})
-        return tokens
+        if price > sma_50:
+             tokens.append({'content': f"confirming breakout above 50SMA (${sma_50}).", 'type': TokenType.CONTEXT.value, 'sentiment': Sentiment.BULLISH.value})
+        else:
+             tokens.append({'content': f"fighting resistance at 50SMA (${sma_50}).", 'type': TokenType.CONTEXT.value, 'sentiment': Sentiment.NEUTRAL.value})
+             
+    # 2. Oversold/Overbought (RSI)
+    elif rsi < 30:
+        tokens.append({'content': "OVERSOLD CAPITULATION", 'type': TokenType.ACTION.value, 'sentiment': Sentiment.BULLISH.value})
+        tokens.append({'content': f"RSI is {rsi}, suggesting mean reversion bounce.", 'type': TokenType.EVIDENCE.value, 'sentiment': Sentiment.BULLISH.value})
+        
+    elif rsi > 70:
+        tokens.append({'content': "OVEREXTENDED RALLY", 'type': TokenType.ACTION.value, 'sentiment': Sentiment.BEARISH.value})
+        tokens.append({'content': f"RSI is {rsi}, profit taking likely.", 'type': TokenType.EVIDENCE.value, 'sentiment': Sentiment.BEARISH.value})
+        
+    # 3. Consolidation (Default)
+    else:
+        tokens.append({'content': "CONSOLIDATING", 'type': TokenType.ACTION.value, 'sentiment': Sentiment.NEUTRAL.value})
+        tokens.append({'content': f"near 50-day SMA (${sma_50});", 'type': TokenType.CONTEXT.value, 'sentiment': Sentiment.NEUTRAL.value})
+        
+        # Try to find a real news catalyst
+        news = fetch_news_for_symbol(symbol, lookback_hours=48)
+        if news:
+            latest = news[0]
+            headline = latest['headline']
+            # Truncate if too long
+            if len(headline) > 60:
+                headline = headline[:57] + "..."
+            tokens.append({'content': f"News: {headline}", 'type': TokenType.CATALYST.value, 'sentiment': latest['sentiment']})
+        else:
+            tokens.append({'content': "awaiting catalyst.", 'type': TokenType.CATALYST.value, 'sentiment': Sentiment.NEUTRAL.value})
 
-    # 4. Mean Reversion (Overbought)
-    if rsi > 70:
-        tokens.append({'content': "PROFIT TAKING", 'type': TokenType.ACTION.value, 'sentiment': Sentiment.BEARISH.value})
-        tokens.append({'content': "suggested;", 'type': TokenType.CONTEXT.value, 'sentiment': Sentiment.NEUTRAL.value})
-        tokens.append({'content': f"Overextended RSI ({int(rsi)})", 'type': TokenType.EVIDENCE.value, 'sentiment': Sentiment.BEARISH.value})
-        tokens.append({'content': "signals pullback.", 'type': TokenType.CONTEXT.value, 'sentiment': Sentiment.NEUTRAL.value})
-        return tokens
-        
-    # Default / Neutral
-    tokens.append({'content': "CONSOLIDATING", 'type': TokenType.ACTION.value, 'sentiment': Sentiment.NEUTRAL.value})
-    tokens.append({'content': "near 50-day MA;", 'type': TokenType.CONTEXT.value, 'sentiment': Sentiment.NEUTRAL.value})
-    tokens.append({'content': "awaiting catalyst.", 'type': TokenType.CONTEXT.value, 'sentiment': Sentiment.NEUTRAL.value})
+    # 4. Sector Context & Relative Strength
+    try:
+        # Sector Comparison
+        sector_sym = SYMBOL_TO_SECTOR.get(symbol)
+        if sector_sym:
+            sector_data = fetch_stock_data(sector_sym)
+            stock_data = fetch_stock_data(symbol)
+            
+            if sector_data and stock_data:
+                rel_perf = stock_data['change_percent'] - sector_data['change_percent']
+                if abs(rel_perf) > 0.5:
+                    perf_text = "outperforming" if rel_perf > 0 else "underperforming"
+                    sentiment = Sentiment.BULLISH.value if rel_perf > 0 else Sentiment.BEARISH.value
+                    tokens.append({'content': f"{perf_text} sector by {abs(rel_perf):.1f}%.", 'type': TokenType.CONTEXT.value, 'sentiment': sentiment})
+                    
+        # Market Comparison (vs SPY)
+        spy_data = fetch_stock_data('^GSPC')
+        stock_data = fetch_stock_data(symbol) # Re-fetch or reuse? Reuse would be better but fetch is cached/fast enough for now
+        if spy_data and stock_data:
+             rel_spy = stock_data['change_percent'] - spy_data['change_percent']
+             if rel_spy > 1.0:
+                 tokens.append({'content': "Showing relative strength vs Market.", 'type': TokenType.EVIDENCE.value, 'sentiment': Sentiment.BULLISH.value})
+                 
+    except Exception as e:
+        print(f"Error adding context: {e}")
+
     return tokens
 
-def get_morning_espresso():
-    """Returns top 3 market stories."""
-    return [
-        {
-            "headline": "Tech Rotates to Value",
-            "bullets": ["Yield curve steepening favors financials", "Nasdaq 100 hits resistance at 15k", "Buy JPM, Sell QQQ"],
-            "sentiment": "CAUTION"
-        },
-        {
-            "headline": "CPI Print Beats Estimates",
-            "bullets": ["Core inflation cools to 3.2%", "Fed pause probability rises to 80%", "Long duration assets bid"],
-            "sentiment": "OPPORTUNITY"
-        },
-        {
-            "headline": "Geopolitical Risk Spikes",
-            "bullets": ["Energy sector acting as hedge", "Defense stocks breaking out", "Monitor XLE and ITA"],
-            "sentiment": "CAUTION"
-        }
-    ]
-
-def get_whisper_numbers():
-    """Returns consensus vs whisper data."""
-    return [
-        {"symbol": "TSLA", "event": "Earnings", "consensus": 3.20, "whisper": 3.55, "date": "Today AMC"},
-        {"symbol": "NVDA", "event": "Earnings", "consensus": 1.10, "whisper": 1.05, "date": "Tomorrow AMC"},
-        {"symbol": "NFP", "event": "Econ Print", "consensus": 180, "whisper": 220, "date": "Friday 8:30"},
-        {"symbol": "AAPL", "event": "Earnings", "consensus": 1.40, "whisper": 1.42, "date": "Next Week"},
-    ]
-
-def get_opportunities(risk_profile="BALANCED"):
-    """Returns filtered opportunities based on risk profile."""
-    # Mock filtering logic
-    all_symbols = list(STOCK_NAMES.keys())
-    random.shuffle(all_symbols)
-    
-    # Filter based on profile (Mock)
-    # Defensive: Low Beta, Div Payers (JNJ, PG, KO, etc.)
-    # Balanced: Mega Cap Tech (AAPL, MSFT, GOOGL)
-    # Speculative: High Beta (TSLA, NVDA, AMD, NFLX)
-    
-    defensive_pool = ['JNJ', 'PG', 'KO', 'PEP', 'WMT', 'UNH', 'VZ', 'T', 'MRK', 'PFE']
-    speculative_pool = ['TSLA', 'NVDA', 'AMD', 'NFLX', 'PYPL', 'META', 'BABA', 'COIN', 'PLTR']
-    balanced_pool = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'V', 'MA', 'JPM', 'DIS', 'CSCO']
-    
-    target_pool = []
-    if risk_profile == "DEFENSIVE":
-        target_pool = defensive_pool
-    elif risk_profile == "SPECULATIVE":
-        target_pool = speculative_pool
-    else:
-        target_pool = balanced_pool
+def get_opportunities(risk_profile="BALANCED", settings=None):
+    """
+    Returns filtered opportunities based on REAL analysis and scoring.
+    """
+    if settings is None:
+        settings = load_settings()
         
-    # Select 3 random from pool that exist in STOCK_NAMES/DATA
-    # Note: SAMPLE_STOCKS contains the keys we use in fetch_stock_data
-    available_pool = [s for s in target_pool if s in SAMPLE_STOCKS]
+    # 1. Filter Pool based on mock risk profile mapping (simplified)
+    # In a real app, we'd map symbols to volatility profiles
+    pool = list(STOCK_NAMES.keys())
     
-    # If pool is empty (due to mock data limits), fallback to sample stocks
-    if not available_pool:
-        available_pool = SAMPLE_STOCKS[:5]
+    # Filter by Sector (Problem Ten)
+    # We need to map sector names back to symbols or vice versa.
+    # SYMBOL_TO_SECTOR maps Symbol -> ETF (e.g. XLK).
+    # We need ETF -> Name mapping.
+    SECTOR_ETF_TO_NAME = {
+        'XLK': 'Technology', 'XLF': 'Financials', 'XLE': 'Energy',
+        'XLV': 'Healthcare', 'XLI': 'Industrials', 'XLP': 'Staples',
+        'XLU': 'Utilities', 'XLY': 'Discretionary', 'XLB': 'Materials',
+        'XLC': 'Communication' # Added XLC
+    }
+    
+    allowed_sectors = settings.get('coverage_sectors', [])
+    filtered_pool = []
+    
+    for sym in pool:
+        etf = SYMBOL_TO_SECTOR.get(sym)
+        if etf:
+            sector_name = SECTOR_ETF_TO_NAME.get(etf, "Unknown")
+            # Check if sector is allowed (fuzzy match or exact?)
+            # Assuming exact match for now, or "All" logic
+            if sector_name in allowed_sectors or not allowed_sectors:
+                filtered_pool.append(sym)
+        else:
+            # If no sector mapping, include by default?
+            filtered_pool.append(sym)
+            
+    pool = filtered_pool
+    
+    # Limit pool for performance in this demo
+    import random
+    random.shuffle(pool)
+    pool = pool[:8] # Analyze random 8 stocks to keep it fast
+    
+    scored_opps = []
+    
+    for symbol in pool:
+        # Calculate Indicators
+        indicators = calculate_real_indicators(symbol)
+        if not indicators:
+            continue
+            
+        # Filter by RVOL Threshold (Problem Ten)
+        min_rvol = settings.get('rvol_threshold', 0.0)
+        if indicators['rvol'] < min_rvol:
+            continue
+            
+        # Calculate Confidence
+        confidence = calculate_setup_confidence(indicators)
         
-    selected = available_pool[:3] if len(available_pool) >= 3 else available_pool
-    
-    results = []
-    for symbol in selected:
-        narrative = generate_narrative(symbol)
-        confidence = random.randint(75, 98)
-        results.append({
-            "symbol": symbol,
-            "name": STOCK_NAMES.get(symbol, symbol),
-            "confidence": confidence,
-            "narrative": narrative
+        # Calculate Opportunity Score
+        opp_score = confidence
+        if indicators['rvol'] > 2.0: opp_score += 10
+        elif indicators['rvol'] > 1.5: opp_score += 5
+        elif indicators['rvol'] < 0.8: opp_score -= 5
+        
+        # Price Action Modifier
+        if indicators['price'] > indicators['sma_50']: opp_score += 3
+        
+        # Calculate ATR
+        atr = calculate_atr(symbol)
+        
+        # Trade Setup Parameters
+        price = indicators['price']
+        stop_loss = 0.0
+        target = 0.0
+        pos_size = "0%"
+        horizon = "Unknown"
+        
+        if risk_profile == "DEFENSIVE":
+            stop_loss = price - (1.5 * atr)
+            target = price + (2.0 * atr)
+            pos_size = "2-3%"
+        elif risk_profile == "BALANCED":
+            stop_loss = price - (2.0 * atr)
+            target = price + (3.0 * atr)
+            pos_size = "3-5%"
+        else: # SPECULATIVE
+            stop_loss = price - (2.5 * atr)
+            target = price + (5.0 * atr)
+            pos_size = "5-8%"
+            
+        risk_reward = (target - price) / (price - stop_loss) if (price - stop_loss) > 0 else 0
+        
+        # Time Horizon Logic
+        if indicators['rvol'] > 2.5 and indicators['macd'] > indicators['macd_signal']:
+            horizon = "Swing (3-10 Days)"
+        elif indicators['rsi'] < 30:
+            horizon = "Mean Reversion (1-3 Days)"
+        else:
+            horizon = "Position (2-4 Weeks)"
+            
+        # Generate Narrative
+        narrative = generate_narrative(symbol, indicators)
+        
+        # Get Catalyst (Earnings)
+        catalyst = get_next_catalyst(symbol)
+        
+        scored_opps.append({
+            'symbol': symbol,
+            'name': STOCK_NAMES.get(symbol, symbol),
+            'confidence': confidence,
+            'opp_score': opp_score,
+            'narrative': narrative,
+            'catalyst': catalyst,
+            'trade_setup': {
+                'entry': price,
+                'stop': round(stop_loss, 2),
+                'target': round(target, 2),
+                'risk_reward': round(risk_reward, 2),
+                'position_size': pos_size,
+                'time_horizon': horizon
+            },
+            'rvol': indicators['rvol'], # For UI sparkline/badge
+            'history': [], # Could fetch if needed for sparkline
+            'change': 0.0, # Placeholder
+            'change_percent': 0.0 # Placeholder
         })
         
-    return results
+    # Sort by Opportunity Score
+    scored_opps.sort(key=lambda x: x['opp_score'], reverse=True)
+    
+    # Return top 3
+    return scored_opps[:3]
 
 def get_morning_espresso_narrative():
-    """Returns a tokenized narrative for the morning market update."""
+    """
+    Returns a tokenized narrative based on REAL market data (Indices, Sectors, Time).
+    """
     tokens = []
-    tokens.append({'content': "MARKET OPEN:", 'type': TokenType.ACTION.value, 'sentiment': Sentiment.NEUTRAL.value})
-    tokens.append({'content': "Futures are pointing", 'type': TokenType.CONTEXT.value, 'sentiment': Sentiment.NEUTRAL.value})
-    tokens.append({'content': "HIGHER", 'type': TokenType.ACTION.value, 'sentiment': Sentiment.BULLISH.value})
-    tokens.append({'content': "as inflation data comes in", 'type': TokenType.CONTEXT.value, 'sentiment': Sentiment.NEUTRAL.value})
-    tokens.append({'content': "COOLER THAN EXPECTED.", 'type': TokenType.EVIDENCE.value, 'sentiment': Sentiment.BULLISH.value})
-    tokens.append({'content': "Tech sector leading the charge with", 'type': TokenType.CONTEXT.value, 'sentiment': Sentiment.NEUTRAL.value})
-    tokens.append({'content': "NVDA +2.5%", 'type': TokenType.CATALYST.value, 'sentiment': Sentiment.BULLISH.value})
-    tokens.append({'content': "premarket.", 'type': TokenType.CONTEXT.value, 'sentiment': Sentiment.NEUTRAL.value})
+    
+    # 1. Time of Day Logic
+    ny_tz = pytz.timezone('America/New_York')
+    now_ny = datetime.now(ny_tz)
+    current_time = now_ny.time()
+    
+    market_open = datetime.strptime("09:30", "%H:%M").time()
+    market_close = datetime.strptime("16:00", "%H:%M").time()
+    
+    session_token = ""
+    if current_time < market_open:
+        session_token = "PREMARKET SESSION"
+    elif current_time > market_close:
+        session_token = "MARKET CLOSE RECAP"
+    else:
+        session_token = "MARKET OPEN"
+        
+    tokens.append({'content': f"{session_token}:", 'type': TokenType.ACTION.value, 'sentiment': Sentiment.NEUTRAL.value})
+
+    # 2. Fetch Major Indices
+    indices = ['^GSPC', '^IXIC', '^DJI']
+    changes = []
+    
+    try:
+        # Batch fetch might be faster but individual is safer for error handling per index
+        for idx in indices:
+            data = fetch_stock_data(idx)
+            if data:
+                changes.append(data.get('change_percent', 0.0))
+                
+        if not changes:
+            avg_change = 0.0
+        else:
+            avg_change = sum(changes) / len(changes)
+            
+        # 3. Classify Market State
+        market_state = "NEUTRAL"
+        sentiment = Sentiment.NEUTRAL.value
+        action_text = "CONSOLIDATION"
+        
+        if avg_change > 1.0:
+            market_state = "STRONGLY BULLISH"
+            sentiment = Sentiment.BULLISH.value
+            action_text = "BROAD RALLY"
+        elif 0.3 <= avg_change <= 1.0:
+            market_state = "MODERATELY BULLISH"
+            sentiment = Sentiment.BULLISH.value
+            action_text = "POSITIVE MOMENTUM"
+        elif -0.3 < avg_change < 0.3:
+            market_state = "NEUTRAL"
+            sentiment = Sentiment.NEUTRAL.value
+            action_text = "RANGE-BOUND TRADING"
+        elif -1.0 <= avg_change <= -0.3:
+            market_state = "MODERATELY BEARISH"
+            sentiment = Sentiment.BEARISH.value
+            action_text = "SELLING PRESSURE"
+        else: # < -1.0
+            market_state = "STRONGLY BEARISH"
+            sentiment = Sentiment.BEARISH.value
+            action_text = "RISK-OFF MOVE"
+            
+        tokens.append({'content': action_text, 'type': TokenType.ACTION.value, 'sentiment': sentiment})
+        
+        # Context with specific numbers
+        sp500 = next((d for d in [fetch_stock_data('^GSPC')] if d), None)
+        nasdaq = next((d for d in [fetch_stock_data('^IXIC')] if d), None)
+        
+        context_str = ""
+        if sp500:
+            sign = "+" if sp500['change_percent'] >= 0 else ""
+            context_str += f"S&P {sign}{sp500['change_percent']:.2f}%"
+        if nasdaq:
+            sign = "+" if nasdaq['change_percent'] >= 0 else ""
+            context_str += f", Nasdaq {sign}{nasdaq['change_percent']:.2f}%"
+            
+        tokens.append({'content': context_str, 'type': TokenType.CONTEXT.value, 'sentiment': Sentiment.NEUTRAL.value})
+        
+        # 4. Sector Analysis
+        sectors = {
+            'XLK': 'Technology', 'XLF': 'Financials', 'XLE': 'Energy',
+            'XLV': 'Healthcare', 'XLI': 'Industrials', 'XLP': 'Staples',
+            'XLU': 'Utilities', 'XLY': 'Discretionary', 'XLB': 'Materials'
+        }
+        
+        best_sector = None
+        best_change = -999.0
+        
+        # Fetch sector data (limit to top 3 for speed if needed, but let's try all)
+        for sym, name in sectors.items():
+            s_data = fetch_stock_data(sym)
+            if s_data and s_data['change_percent'] > best_change:
+                best_change = s_data['change_percent']
+                best_sector = name
+                
+        if best_sector:
+            tokens.append({'content': f"{best_sector.upper()} SECTOR OUTPERFORMING", 'type': TokenType.CATALYST.value, 'sentiment': Sentiment.BULLISH.value})
+            tokens.append({'content': f"(+{best_change:.2f}%)", 'type': TokenType.CONTEXT.value, 'sentiment': Sentiment.NEUTRAL.value})
+
+    except Exception as e:
+        # Fallback if fetching fails
+        print(f"Error generating narrative: {e}")
+        tokens.append({'content': "Market data unavailable.", 'type': TokenType.CONTEXT.value, 'sentiment': Sentiment.NEUTRAL.value})
+
     return tokens
+
+# --- News Engine ---
+
+def analyze_sentiment(headline):
+    """
+    Analyzes headline sentiment using keyword scoring.
+    Returns: BULLISH, BEARISH, or NEUTRAL
+    """
+    headline_lower = headline.lower()
+    
+    bullish_keywords = [
+        "beat", "beats", "exceed", "exceeds", "surge", "surges", "surged", "rally", "rallies", "rallied",
+        "upgrade", "upgraded", "breakout", "breakthrough", "growth", "strong", "robust", "outperform",
+        "acquisition", "approved", "approval", "win", "wins", "won", "positive", "record", "high",
+        "soar", "soars", "jump", "jumps", "expand"
+    ]
+    
+    bearish_keywords = [
+        "miss", "misses", "missed", "decline", "declines", "declined", "fall", "falls", "fell",
+        "drop", "drops", "dropped", "plunge", "plunges", "plunged", "downgrade", "downgraded",
+        "lawsuit", "investigation", "probe", "recall", "cut", "cuts", "loss", "losses", "weak",
+        "weakness", "underperform", "concern", "concerns", "warning", "warns", "warned", "risk",
+        "low", "slump", "slumps", "tumble"
+    ]
+    
+    bullish_score = 0
+    bearish_score = 0
+    
+    words = headline_lower.split()
+    
+    # Simple scoring (could be weighted)
+    for word in words:
+        # Strip punctuation
+        clean_word = word.strip('.,:;!?')
+        if clean_word in bullish_keywords:
+            bullish_score += 1
+        elif clean_word in bearish_keywords:
+            bearish_score += 1
+            
+    if bullish_score > bearish_score:
+        return Sentiment.BULLISH.value
+    elif bearish_score > bullish_score:
+        return Sentiment.BEARISH.value
+    else:
+        return Sentiment.NEUTRAL.value
+
+def load_news_from_cache(symbol, max_age_hours=1):
+    """Loads news from local JSON cache if fresh."""
+    cache_file = "news_cache.json"
+    if not os.path.exists(cache_file):
+        return None
+        
+    try:
+        with open(cache_file, 'r') as f:
+            cache = json.load(f)
+            
+        if symbol in cache:
+            entry = cache[symbol]
+            last_updated = datetime.fromisoformat(entry['last_updated'])
+            if datetime.now() - last_updated < timedelta(hours=max_age_hours):
+                return entry['articles']
+    except Exception as e:
+        print(f"Cache load error: {e}")
+        
+    return None
+
+def save_news_to_cache(symbol, articles):
+    """Saves news to local JSON cache."""
+    cache_file = "news_cache.json"
+    cache = {}
+    
+    if os.path.exists(cache_file):
+        try:
+            with open(cache_file, 'r') as f:
+                cache = json.load(f)
+        except:
+            pass
+            
+    cache[symbol] = {
+        'last_updated': datetime.now().isoformat(),
+        'articles': articles
+    }
+    
+    try:
+        with open(cache_file, 'w') as f:
+            json.dump(cache, f, indent=2)
+    except Exception as e:
+        print(f"Cache save error: {e}")
+
+def fetch_news_for_symbol(symbol, lookback_hours=24):
+    """
+    Fetches news from yfinance, analyzes sentiment, and caches results.
+    """
+    # Check cache first
+    cached_news = load_news_from_cache(symbol)
+    if cached_news:
+        return cached_news
+        
+    news_events = []
+    try:
+        ticker = yf.Ticker(symbol)
+        raw_news = ticker.news
+        
+        cutoff_time = datetime.now() - timedelta(hours=lookback_hours)
+        
+        for item in raw_news:
+            # Parse timestamp
+            ts = item.get('providerPublishTime')
+            if ts:
+                pub_time = datetime.fromtimestamp(ts)
+            else:
+                pub_time = datetime.now() # Fallback
+                
+            if pub_time < cutoff_time:
+                continue
+                
+            headline = item.get('title', '')
+            sentiment = analyze_sentiment(headline)
+            
+            event = {
+                'event_id': f"{symbol}_{item.get('uuid', uuid.uuid4())}",
+                'event_type': 'NEWS',
+                'symbol': symbol,
+                'timestamp': pub_time.isoformat(), # Serialize for JSON
+                'headline': headline,
+                'source': item.get('publisher', 'Unknown'),
+                'url': item.get('link', ''),
+                'sentiment': sentiment
+            }
+            news_events.append(event)
+            
+        # Save to cache
+        save_news_to_cache(symbol, news_events)
+        
+    except Exception as e:
+        print(f"Error fetching news for {symbol}: {e}")
+        
+    return news_events
+
+def get_next_catalyst(symbol):
+    """
+    Finds next earnings date or event.
+    """
+    try:
+        ticker = yf.Ticker(symbol)
+        calendar = ticker.calendar
+        
+        if calendar and 'Earnings Date' in calendar:
+            # yfinance calendar format varies, sometimes it's a dict, sometimes list
+            # Assuming dict with 'Earnings Date' list
+            earnings_dates = calendar.get('Earnings Date', [])
+            if earnings_dates:
+                next_date = earnings_dates[0] # datetime.date object
+                days_until = (next_date - datetime.now().date()).days
+                
+                if 0 <= days_until <= 30:
+                    return f"Earnings in {days_until} days ({next_date.strftime('%Y-%m-%d')})"
+                elif days_until < 0:
+                     return "Earnings passed"
+                else:
+                     return f"Earnings on {next_date.strftime('%Y-%m-%d')}"
+                     
+        return "No upcoming catalyst"
+    except:
+        return "TBD"
+
+# --- Advanced Analytics (Phase 4) ---
+
+def fetch_fundamentals(symbol):
+    """
+    Fetches fundamental data (Valuation, Profitability, Growth).
+    Returns a dictionary of metrics.
+    """
+    try:
+        ticker = yf.Ticker(symbol)
+        info = ticker.info
+        
+        # Valuation
+        pe = info.get('trailingPE', 0)
+        fpe = info.get('forwardPE', 0)
+        peg = info.get('pegRatio', 0)
+        ps = info.get('priceToSalesTrailing12Months', 0)
+        pb = info.get('priceToBook', 0)
+        mkt_cap = info.get('marketCap', 0)
+        
+        # Profitability
+        gross_margin = info.get('grossMargins', 0)
+        op_margin = info.get('operatingMargins', 0)
+        net_margin = info.get('profitMargins', 0)
+        roe = info.get('returnOnEquity', 0)
+        
+        # Growth (Quarterly)
+        rev_growth = info.get('revenueGrowth', 0)
+        earn_growth = info.get('earningsGrowth', 0)
+        
+        return {
+            'pe': round(pe, 2) if pe else 0,
+            'fpe': round(fpe, 2) if fpe else 0,
+            'peg': round(peg, 2) if peg else 0,
+            'ps': round(ps, 2) if ps else 0,
+            'pb': round(pb, 2) if pb else 0,
+            'mkt_cap': mkt_cap,
+            'gross_margin': round(gross_margin * 100, 1) if gross_margin else 0,
+            'op_margin': round(op_margin * 100, 1) if op_margin else 0,
+            'net_margin': round(net_margin * 100, 1) if net_margin else 0,
+            'roe': round(roe * 100, 1) if roe else 0,
+            'rev_growth': round(rev_growth * 100, 1) if rev_growth else 0,
+            'earn_growth': round(earn_growth * 100, 1) if earn_growth else 0
+        }
+    except Exception as e:
+        print(f"Error fetching fundamentals for {symbol}: {e}")
+        return None
+
+def calculate_risk_metrics(symbol, lookback_years=1):
+    """
+    Calculates real risk metrics (Beta, Sharpe, Volatility, Drawdown).
+    """
+    try:
+        ticker = yf.Ticker(symbol)
+        # Fetch 1 year of data
+        end_date = datetime.now()
+        start_date = end_date - timedelta(days=365*lookback_years)
+        
+        df = ticker.history(start=start_date, end=end_date, interval="1d")
+        if df.empty or len(df) < 200:
+            return None
+            
+        # Benchmark (SPY) for Beta
+        spy = yf.Ticker("SPY")
+        spy_df = spy.history(start=start_date, end=end_date, interval="1d")
+        
+        # Align dates
+        df_rets = df['Close'].pct_change().dropna()
+        spy_rets = spy_df['Close'].pct_change().dropna()
+        
+        # Inner join to ensure same dates
+        aligned = pd.concat([df_rets, spy_rets], axis=1, join='inner')
+        aligned.columns = ['Stock', 'SPY']
+        
+        returns = aligned['Stock']
+        market_returns = aligned['SPY']
+        
+        # 1. Beta
+        covariance = returns.cov(market_returns)
+        variance = market_returns.var()
+        beta = covariance / variance if variance != 0 else 1.0
+        
+        # 2. Volatility (Annualized)
+        volatility = returns.std() * np.sqrt(252)
+        
+        # 3. Sharpe Ratio (Risk Free Rate assumed 4%)
+        rf_rate = 0.04
+        excess_returns = returns - (rf_rate / 252)
+        sharpe = (excess_returns.mean() / returns.std()) * np.sqrt(252) if returns.std() != 0 else 0
+        
+        # 4. Max Drawdown
+        cumulative = (1 + returns).cumprod()
+        peak = cumulative.cummax()
+        drawdown = (cumulative - peak) / peak
+        max_drawdown = drawdown.min()
+        
+        # Classification
+        risk_level = "MODERATE"
+        if beta > 1.5 or volatility > 0.4:
+            risk_level = "AGGRESSIVE"
+        elif beta < 0.8 and volatility < 0.2:
+            risk_level = "DEFENSIVE"
+            
+        return {
+            'beta': round(beta, 2),
+            'sharpe': round(sharpe, 2),
+            'volatility': round(volatility * 100, 1),
+            'max_drawdown': round(max_drawdown * 100, 1),
+            'risk_level': risk_level
+        }
+        
+    except Exception as e:
+        print(f"Error calculating risk metrics for {symbol}: {e}")
+        return None
+
+# --- Settings Persistence ---
+
+def load_settings():
+    """Loads user settings from JSON."""
+    settings_file = "user_settings.json"
+    default_settings = {
+        "risk_profile": "BALANCED",
+        "dark_mode": True,
+        "notifications": True,
+        "rvol_threshold": 1.0,
+        "coverage_sectors": ["Technology", "Financials", "Energy", "Healthcare", "Industrials", "Staples", "Utilities", "Discretionary", "Materials"]
+    }
+    
+    if not os.path.exists(settings_file):
+        return default_settings
+        
+    try:
+        with open(settings_file, 'r') as f:
+            saved = json.load(f)
+            # Merge with defaults to ensure all keys exist
+            default_settings.update(saved)
+            return default_settings
+    except:
+        return default_settings
+
+def save_settings(settings):
+    """Saves user settings to JSON."""
+    settings_file = "user_settings.json"
+    try:
+        with open(settings_file, 'w') as f:
+            json.dump(settings, f, indent=2)
+    except Exception as e:
+        print(f"Error saving settings: {e}")
