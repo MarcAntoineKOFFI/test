@@ -1,0 +1,14 @@
+[
+  {
+    "symbol": "TEST",
+    "name": "Test Corp",
+    "confidence": 90,
+    "narrative": [],
+    "trade_setup": {
+      "entry": 100
+    },
+    "created_at": "2025-11-23T12:48:32.785029",
+    "id": "84a4a095-09a8-45b5-bed6-b88b2d48c06f",
+    "status": "OPEN"
+  }
+]

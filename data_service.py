@@ -1041,3 +1041,233 @@ def save_settings(settings):
             json.dump(settings, f, indent=2)
     except Exception as e:
         print(f"Error saving settings: {e}")
+
+# --- Phase 5: Market Regime & Advanced Analytics ---
+
+def detect_market_regime():
+    """
+    Analyzes SPY to determine the current market regime.
+    Returns a dictionary with regime details.
+    """
+    try:
+        spy = yf.Ticker("SPY")
+        # Fetch enough data for 50 SMA and ATR
+        df = spy.history(period="3mo", interval="1d")
+        
+        if df.empty or len(df) < 50:
+            return {
+                "regime": "NEUTRAL",
+                "trend": "SIDEWAYS",
+                "volatility": "NORMAL",
+                "description": "Insufficient data to determine regime."
+            }
+            
+        close = df['Close']
+        
+        # 1. Trend Analysis (20 vs 50 SMA)
+        sma_20 = close.rolling(window=20).mean().iloc[-1]
+        sma_50 = close.rolling(window=50).mean().iloc[-1]
+        current_price = close.iloc[-1]
+        
+        trend = "SIDEWAYS"
+        if current_price > sma_20 > sma_50:
+            trend = "STRONG UPTREND"
+        elif current_price < sma_20 < sma_50:
+            trend = "STRONG DOWNTREND"
+        elif current_price > sma_50:
+            trend = "UPTREND"
+        elif current_price < sma_50:
+            trend = "DOWNTREND"
+            
+        # 2. Volatility Analysis (ATR / Price)
+        high_low = df['High'] - df['Low']
+        atr_14 = high_low.rolling(window=14).mean().iloc[-1]
+        atr_pct = (atr_14 / current_price) * 100
+        
+        volatility = "NORMAL"
+        if atr_pct > 1.5:
+            volatility = "HIGH"
+        elif atr_pct < 0.5:
+            volatility = "LOW"
+            
+        # 3. Regime Classification
+        regime = "NEUTRAL"
+        description = "Market is directionless."
+        
+        if trend == "STRONG UPTREND" and volatility == "LOW":
+            regime = "BULLISH GRIND"
+            description = "Steady uptrend with low volatility. Buy dips."
+        elif trend == "STRONG UPTREND" and volatility == "HIGH":
+            regime = "VOLATILE BULL"
+            description = "Uptrend but choppy. Wide stops needed."
+        elif trend == "STRONG DOWNTREND":
+            regime = "BEARISH"
+            description = "Market in correction. Cash is king."
+        elif trend == "SIDEWAYS" and volatility == "HIGH":
+            regime = "CHOPPY"
+            description = "No clear trend and high risk. Reduce size."
+            
+        return {
+            "regime": regime,
+            "trend": trend,
+            "volatility": volatility,
+            "description": description,
+            "sma_20": round(sma_20, 2),
+            "sma_50": round(sma_50, 2),
+            "atr_pct": round(atr_pct, 2)
+        }
+        
+    except Exception as e:
+        print(f"Error detecting market regime: {e}")
+        return {"regime": "UNKNOWN", "trend": "UNKNOWN", "volatility": "UNKNOWN", "description": "Error analyzing market."}
+
+def analyze_sector_rotation():
+    """
+    Analyzes sector ETF performance to identify rotation.
+    Returns sorted list of sectors (best to worst).
+    """
+    sectors = {
+        'XLK': 'Technology', 'XLF': 'Financials', 'XLE': 'Energy',
+        'XLV': 'Healthcare', 'XLI': 'Industrials', 'XLP': 'Staples',
+        'XLU': 'Utilities', 'XLY': 'Discretionary', 'XLB': 'Materials',
+        'XLC': 'Communication', 'IYR': 'Real Estate'
+    }
+    
+    results = []
+    try:
+        # Batch fetch would be ideal, but loop is fine for 11 items
+        for sym, name in sectors.items():
+            ticker = yf.Ticker(sym)
+            hist = ticker.history(period="1mo", interval="1d")
+            
+            if not hist.empty:
+                current = hist['Close'].iloc[-1]
+                prev_1d = hist['Close'].iloc[-2] if len(hist) > 1 else current
+                prev_1w = hist['Close'].iloc[-6] if len(hist) > 6 else current
+                prev_1mo = hist['Close'].iloc[0]
+                
+                chg_1d = ((current - prev_1d) / prev_1d) * 100
+                chg_1w = ((current - prev_1w) / prev_1w) * 100
+                chg_1mo = ((current - prev_1mo) / prev_1mo) * 100
+                
+                results.append({
+                    'symbol': sym,
+                    'name': name,
+                    '1d': round(chg_1d, 2),
+                    '1w': round(chg_1w, 2),
+                    '1mo': round(chg_1mo, 2)
+                })
+                
+        # Sort by 1 week performance (momentum)
+        results.sort(key=lambda x: x['1w'], reverse=True)
+        return results
+        
+    except Exception as e:
+        print(f"Error analyzing sectors: {e}")
+        return []
+
+def save_opportunity_to_history(opportunity):
+    """
+    Saves a generated opportunity to a history JSON file.
+    """
+    history_file = "idea_history.json"
+    history = []
+    
+    if os.path.exists(history_file):
+        try:
+            with open(history_file, 'r') as f:
+                history = json.load(f)
+        except:
+            pass
+            
+    # Add timestamp and ID
+    opportunity['created_at'] = datetime.now().isoformat()
+    opportunity['id'] = str(uuid.uuid4())
+    opportunity['status'] = 'OPEN' # OPEN, CLOSED, EXPIRED
+    
+    # Keep only last 50
+    history.insert(0, opportunity)
+    history = history[:50]
+    
+    try:
+        with open(history_file, 'w') as f:
+            json.dump(history, f, indent=2)
+    except Exception as e:
+        print(f"Error saving history: {e}")
+
+def get_idea_history():
+    """Returns the list of saved opportunities."""
+    history_file = "idea_history.json"
+    if not os.path.exists(history_file):
+        return []
+    try:
+        with open(history_file, 'r') as f:
+            return json.load(f)
+    except:
+        return []
+
+def analyze_portfolio_correlation(symbols):
+    """
+    Calculates correlation matrix for a list of symbols.
+    Returns the average correlation (0-1).
+    """
+    if not symbols or len(symbols) < 2:
+        return 0.0
+        
+    try:
+        data = {}
+        for sym in symbols:
+            ticker = yf.Ticker(sym)
+            hist = ticker.history(period="3mo", interval="1d")
+            if not hist.empty:
+                data[sym] = hist['Close'].pct_change().dropna()
+                
+        df = pd.DataFrame(data)
+        corr_matrix = df.corr()
+        
+        # Calculate average off-diagonal correlation
+        # Sum of all values minus diagonal (1s) divided by number of off-diagonal elements
+        n = len(df.columns)
+        if n < 2: return 0.0
+        
+        sum_corr = corr_matrix.sum().sum() - n
+        avg_corr = sum_corr / (n * (n - 1))
+        
+        return round(avg_corr, 2)
+        
+    except Exception as e:
+        print(f"Error calculating correlation: {e}")
+        return 0.0
+
+def get_earnings_calendar(days=7):
+    """
+    Fetches upcoming earnings for the coverage universe.
+    """
+    # In a real app with a paid API, we'd query a calendar endpoint.
+    # yfinance calendar is per-ticker and can be slow/unreliable for scanning.
+    # We will scan the SAMPLE_STOCKS list.
+    
+    upcoming = []
+    for sym in SAMPLE_STOCKS:
+        try:
+            ticker = yf.Ticker(sym)
+            # This is slow, so in production we'd cache this heavily
+            # For demo, we might mock or limit to top 5
+            cal = ticker.calendar
+            if cal and 'Earnings Date' in cal:
+                dates = cal.get('Earnings Date', [])
+                if dates:
+                    next_date = dates[0]
+                    days_until = (next_date - datetime.now().date()).days
+                    
+                    if 0 <= days_until <= days:
+                        upcoming.append({
+                            'symbol': sym,
+                            'date': next_date.strftime('%Y-%m-%d'),
+                            'days_until': days_until
+                        })
+        except:
+            continue
+            
+    upcoming.sort(key=lambda x: x['days_until'])
+    return upcoming

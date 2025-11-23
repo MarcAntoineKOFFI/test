@@ -1,7 +1,8 @@
 import random
 from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, QFrame, 
                                QPushButton, QGridLayout, QSizePolicy, QStackedWidget, QScrollArea,
-                               QCheckBox, QSlider, QLineEdit, QButtonGroup, QGraphicsDropShadowEffect, QApplication)
+                               QCheckBox, QSlider, QLineEdit, QButtonGroup, QGraphicsDropShadowEffect, QApplication,
+                               QTableWidget, QTableWidgetItem, QHeaderView)
 from PySide6.QtCore import Qt, Signal, QSize, QUrl, QByteArray, QTimer, QDateTime
 from PySide6.QtGui import QPainter, QColor, QPen, QBrush, QLinearGradient, QFont, QPixmap, QPainterPath
 from PySide6.QtNetwork import QNetworkAccessManager, QNetworkRequest, QNetworkReply
@@ -974,9 +975,19 @@ class MorningEspressoWidget(QFrame):
         layout.setContentsMargins(20, 20, 20, 20)
         
         # Header
+        header_layout = QHBoxLayout()
         header = QLabel("MORNING ESPRESSO")
         header.setStyleSheet(f"color: {styles.COLORS['accent']}; font-weight: 900; letter-spacing: 2px; font-size: 14px; border: none; background: transparent;")
-        layout.addWidget(header)
+        header_layout.addWidget(header)
+        
+        header_layout.addStretch()
+        
+        # Regime Badge
+        self.regime_badge = QLabel("NEUTRAL")
+        self.regime_badge.hide() # Hidden by default until data loaded
+        header_layout.addWidget(self.regime_badge)
+        
+        layout.addLayout(header_layout)
         
         # Content
         self.content_label = QLabel("Loading narrative...")
@@ -1014,7 +1025,25 @@ class MorningEspressoWidget(QFrame):
             symbol = link.split(":")[1]
             self.ticker_clicked.emit(symbol)
 
-    def set_data(self, narrative_tokens):
+    def set_data(self, narrative_tokens, regime_data=None):
+        # 1. Update Regime Badge if provided
+        if regime_data:
+            regime = regime_data.get('regime', 'NEUTRAL')
+            trend = regime_data.get('trend', 'SIDEWAYS')
+            vol = regime_data.get('volatility', 'NORMAL')
+            
+            # Color logic
+            color = styles.COLORS['text_secondary']
+            if "BULL" in regime: color = styles.COLORS['success']
+            elif "BEAR" in regime: color = styles.COLORS['danger']
+            elif "CHOPPY" in regime: color = styles.COLORS['warning']
+            
+            self.regime_badge.setText(f"{regime} • {trend}")
+            self.regime_badge.setStyleSheet(f"color: {color}; border: 1px solid {color}; border-radius: 4px; padding: 4px 8px; font-size: 10px; font-weight: bold;")
+            self.regime_badge.show()
+        else:
+            self.regime_badge.hide()
+
         html = ""
         # Simulate "Block Layout" by treating tokens as potential blocks if needed, 
         # but for now we construct a rich paragraph with interactive tickers.
@@ -1051,6 +1080,98 @@ class MorningEspressoWidget(QFrame):
             
         self.content_label.setText(html)
 
+class SectorRotationWidget(QFrame):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setStyleSheet(f"background-color: {styles.COLORS['surface']}; border-radius: 10px; border: 1px solid {styles.COLORS['surface_light']};")
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(15, 15, 15, 15)
+        layout.setSpacing(10)
+        
+        header = QLabel("SECTOR ROTATION (1W)")
+        header.setStyleSheet(f"color: {styles.COLORS['text_secondary']}; font-size: 11px; font-weight: bold; letter-spacing: 1px;")
+        layout.addWidget(header)
+        
+        self.grid = QGridLayout()
+        self.grid.setSpacing(5)
+        layout.addLayout(self.grid)
+        
+    def set_data(self, sectors):
+        # Clear
+        while self.grid.count():
+            item = self.grid.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
+                
+        # Display as a heatmap grid
+        # Top 3 Green, Bottom 3 Red, Middle Grey
+        
+        for i, sector in enumerate(sectors):
+            name = sector['name']
+            change = sector['1w']
+            
+            # Color
+            bg_color = styles.COLORS['surface_light']
+            text_color = "white"
+            
+            if change > 1.0:
+                bg_color = styles.COLORS['success'] + "40" # Low opacity
+                text_color = styles.COLORS['success']
+            elif change < -1.0:
+                bg_color = styles.COLORS['danger'] + "40"
+                text_color = styles.COLORS['danger']
+                
+            lbl = QLabel(f"{name}\n{change:+.1f}%")
+            lbl.setAlignment(Qt.AlignCenter)
+            lbl.setStyleSheet(f"background-color: {bg_color}; color: {text_color}; border-radius: 4px; font-size: 10px; font-weight: bold; padding: 5px;")
+            
+            row = i // 3
+            col = i % 3
+            self.grid.addWidget(lbl, row, col)
+
+class EarningsWidget(QFrame):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setStyleSheet(f"background-color: {styles.COLORS['surface']}; border-radius: 10px; border: 1px solid {styles.COLORS['surface_light']};")
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(15, 15, 15, 15)
+        layout.setSpacing(10)
+        
+        header = QLabel("UPCOMING EARNINGS")
+        header.setStyleSheet(f"color: {styles.COLORS['text_secondary']}; font-size: 11px; font-weight: bold; letter-spacing: 1px;")
+        layout.addWidget(header)
+        
+        self.list_layout = QVBoxLayout()
+        layout.addLayout(self.list_layout)
+        layout.addStretch()
+        
+    def set_data(self, earnings):
+        while self.list_layout.count():
+            item = self.list_layout.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
+                
+        if not earnings:
+            lbl = QLabel("No earnings in next 7 days.")
+            lbl.setStyleSheet(f"color: {styles.COLORS['text_secondary']}; font-style: italic; font-size: 11px;")
+            self.list_layout.addWidget(lbl)
+            return
+            
+        for item in earnings[:5]: # Show top 5
+            row = QHBoxLayout()
+            
+            sym = QLabel(item['symbol'])
+            sym.setStyleSheet("color: white; font-weight: bold;")
+            
+            date = QLabel(f"in {item['days_until']} days")
+            date.setStyleSheet(f"color: {styles.COLORS['text_secondary']}; font-size: 11px;")
+            
+            row.addWidget(sym)
+            row.addStretch()
+            row.addWidget(date)
+            
+            self.list_layout.addLayout(row)
+
 class RiskProfileSelector(QWidget):
     profileChanged = Signal(str)
     
@@ -1078,6 +1199,19 @@ class RiskProfileSelector(QWidget):
             
         self.current_profile = "BALANCED"
         self.update_styles()
+        
+        # Risk Warning Label
+        self.warning_label = QLabel("")
+        self.warning_label.setStyleSheet(f"color: {styles.COLORS['danger']}; font-size: 10px; font-weight: bold; margin-left: 10px;")
+        self.warning_label.hide()
+        layout.addWidget(self.warning_label)
+        
+    def set_risk_warning(self, visible, text=""):
+        if visible:
+            self.warning_label.setText(text)
+            self.warning_label.show()
+        else:
+            self.warning_label.hide()
         
     def on_click(self, name):
         self.current_profile = name
@@ -1240,6 +1374,12 @@ class OpportunityCard(QFrame):
         
         QTimer.singleShot(2000, lambda: self.restore_copy_btn(original_text))
         
+        # Save to History
+        try:
+            data_service.save_opportunity_to_history(data)
+        except Exception as e:
+            print(f"Error saving history: {e}")
+        
     def restore_copy_btn(self, text):
         self.copy_btn.setText(text)
         self.copy_btn.setStyleSheet(f"background-color: {styles.COLORS['surface_light']}; color: white; border-radius: 4px; font-size: 10px; font-weight: bold;")
@@ -1344,6 +1484,26 @@ class TalkingPointsView(QWidget):
         self.refresh_btn.clicked.connect(self.refresh_data)
         header.addWidget(self.refresh_btn)
         
+        self.history_btn = QPushButton("HISTORY")
+        self.history_btn.setCursor(Qt.PointingHandCursor)
+        self.history_btn.setFixedSize(70, 30)
+        self.history_btn.setStyleSheet(f"""
+            QPushButton {{
+                background-color: {styles.COLORS['surface_light']};
+                color: {styles.COLORS['text_secondary']};
+                border: 1px solid {styles.COLORS['surface_light']};
+                border-radius: 15px;
+                font-weight: bold;
+                font-size: 10px;
+            }}
+            QPushButton:hover {{
+                border: 1px solid {styles.COLORS['accent']};
+                color: white;
+            }}
+        """)
+        self.history_btn.clicked.connect(self.show_history)
+        header.addWidget(self.history_btn)
+        
         header.addSpacing(20)
         
         self.risk_selector = RiskProfileSelector()
@@ -1360,9 +1520,16 @@ class TalkingPointsView(QWidget):
         # 1. Morning Espresso (Large Left Block)
         self.espresso = MorningEspressoWidget()
         self.espresso.ticker_clicked.connect(self.ticker_selected.emit) # Connect signal
-        self.grid.addWidget(self.espresso, 0, 0, 2, 1) # Row 0, Col 0, RowSpan 2, ColSpan 1
+        self.grid.addWidget(self.espresso, 0, 0, 1, 2) # Full width top
         
-        # 2. Opportunities List (Right Column)
+        # 2. Middle Row: Sector Rotation & Earnings
+        self.sector_widget = SectorRotationWidget()
+        self.grid.addWidget(self.sector_widget, 1, 0, 1, 1)
+        
+        self.earnings_widget = EarningsWidget()
+        self.grid.addWidget(self.earnings_widget, 1, 1, 1, 1)
+        
+        # 3. Opportunities List (Bottom Row)
         self.opp_container = QWidget()
         self.opp_layout = QVBoxLayout(self.opp_container)
         self.opp_layout.setContentsMargins(0, 0, 0, 0)
@@ -1374,11 +1541,11 @@ class TalkingPointsView(QWidget):
         scroll.setStyleSheet("background: transparent; border: none;")
         scroll.setWidget(self.opp_container)
         
-        self.grid.addWidget(scroll, 0, 1, 2, 1)
+        self.grid.addWidget(scroll, 2, 0, 1, 2) # Full width bottom
         
         # Column Stretch
         self.grid.setColumnStretch(0, 1)
-        self.grid.setColumnStretch(1, 2)
+        self.grid.setColumnStretch(1, 1)
         
         # Initial Load
         self.refresh_data()
@@ -1387,9 +1554,18 @@ class TalkingPointsView(QWidget):
         # Show loading state
         QApplication.setOverrideCursor(Qt.WaitCursor)
         try:
-            # 1. Morning Espresso
+            # 1. Morning Espresso & Regime
             espresso_data = data_service.get_morning_espresso_narrative()
-            self.espresso.set_data(espresso_data)
+            regime_data = data_service.detect_market_regime()
+            self.espresso.set_data(espresso_data, regime_data)
+            
+            # 2. Sector Rotation
+            sectors = data_service.analyze_sector_rotation()
+            self.sector_widget.set_data(sectors)
+            
+            # 3. Earnings
+            earnings = data_service.get_earnings_calendar()
+            self.earnings_widget.set_data(earnings)
             
             # 2. Opportunities
             self.refresh_opportunities(self.risk_selector.current_profile)
@@ -1408,6 +1584,17 @@ class TalkingPointsView(QWidget):
                 item.widget().deleteLater()
                 
         opps = data_service.get_opportunities(profile)
+        
+        # Check Correlation of Top Picks
+        symbols = [o['symbol'] for o in opps]
+        correlation = data_service.analyze_portfolio_correlation(symbols)
+        
+        # Update Risk Badge (reuse or create new)
+        if correlation > 0.7:
+             self.risk_selector.set_risk_warning(True, f"High Correlation: {correlation:.2f}")
+        else:
+             self.risk_selector.set_risk_warning(False)
+             
         for opp in opps:
             card = OpportunityCard(opp)
             # Connect click signal
@@ -1415,6 +1602,67 @@ class TalkingPointsView(QWidget):
             self.opp_layout.addWidget(card)
             
         self.opp_layout.addStretch()
+
+    def show_history(self):
+        self.history_window = IdeaHistoryView()
+        history_data = data_service.get_idea_history()
+        self.history_window.set_data(history_data)
+        self.history_window.resize(600, 400)
+        self.history_window.show()
+
+class IdeaHistoryView(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setStyleSheet(f"background-color: {styles.COLORS['surface']}; border-radius: 10px; border: 1px solid {styles.COLORS['surface_light']};")
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(15, 15, 15, 15)
+        layout.setSpacing(10)
+        
+        header = QLabel("IDEA HISTORY")
+        header.setStyleSheet(f"color: {styles.COLORS['text_secondary']}; font-size: 11px; font-weight: bold; letter-spacing: 1px;")
+        layout.addWidget(header)
+        
+        self.table = QTableWidget()
+        self.table.setColumnCount(5)
+        self.table.setHorizontalHeaderLabels(["Date", "Symbol", "Status", "Entry", "Result"])
+        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.table.verticalHeader().setVisible(False)
+        self.table.setStyleSheet(f"""
+            QTableWidget {{
+                background-color: transparent;
+                border: none;
+                gridline-color: {styles.COLORS['surface_light']};
+            }}
+            QHeaderView::section {{
+                background-color: {styles.COLORS['surface_light']};
+                color: {styles.COLORS['text_secondary']};
+                border: none;
+                padding: 5px;
+                font-weight: bold;
+            }}
+            QTableWidget::item {{
+                color: white;
+                padding: 5px;
+            }}
+        """)
+        layout.addWidget(self.table)
+        
+    def set_data(self, history):
+        self.table.setRowCount(len(history))
+        for i, item in enumerate(history):
+            date_str = item.get('created_at', '')[:10]
+            setup = item.get('trade_setup', {})
+            
+            self.table.setItem(i, 0, QTableWidgetItem(date_str))
+            self.table.setItem(i, 1, QTableWidgetItem(item.get('symbol', '')))
+            self.table.setItem(i, 2, QTableWidgetItem(item.get('status', 'OPEN')))
+            self.table.setItem(i, 3, QTableWidgetItem(f"${setup.get('entry', 0):.2f}"))
+            
+            # Mock Result
+            result = "---"
+            if item.get('status') == 'CLOSED':
+                result = "+5.2%" # Mock
+            self.table.setItem(i, 4, QTableWidgetItem(result))
 
 # --- Settings View ---
 
@@ -1634,6 +1882,12 @@ class SettingsView(QWidget):
         
         # Load Settings
         self.load_state()
+
+    def set_risk_warning(self, visible, text=""):
+        # This method should be in RiskProfileSelector, not SettingsView
+        # But since I called it on self.risk_selector in TalkingPointsView, 
+        # I need to implement it in RiskProfileSelector class.
+        pass
 
     def on_rvol_changed(self, value):
         float_val = value / 10.0
