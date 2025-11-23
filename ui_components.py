@@ -2,7 +2,7 @@ import random
 from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, QFrame, 
                                QPushButton, QGridLayout, QSizePolicy, QStackedWidget, QScrollArea,
                                QCheckBox, QSlider, QLineEdit, QButtonGroup, QGraphicsDropShadowEffect, QApplication,
-                               QTableWidget, QTableWidgetItem, QHeaderView)
+                               QTableWidget, QTableWidgetItem, QHeaderView, QComboBox, QTabWidget, QTabBar)
 from PySide6.QtCore import Qt, Signal, QSize, QUrl, QByteArray, QTimer, QDateTime
 from PySide6.QtGui import QPainter, QColor, QPen, QBrush, QLinearGradient, QFont, QPixmap, QPainterPath
 from PySide6.QtNetwork import QNetworkAccessManager, QNetworkRequest, QNetworkReply
@@ -253,13 +253,26 @@ class SparklineWidget(QWidget):
         painter.setBrush(pill_color)
         painter.drawRoundedRect(int(width - 8), int(height/2 - 10), 4, 20, 2, 2)
 
-class DetailedChartWidget(SparklineWidget):
-    def __init__(self, data, dates=None, parent=None):
-        super().__init__(data, rvol=0, parent=parent)
+class DetailedChartWidget(QWidget):
+    def __init__(self, data=None, dates=None, parent=None):
+        super().__init__(parent)
+        self.data = data if data else [] # Can be list of floats (line) or list of dicts (ohlc)
         self.dates = dates if dates else []
+        self.chart_type = "CANDLE" # LINE or CANDLE
         self.setMinimumHeight(300)
         self.setMouseTracking(True)
         self.cursor_pos = None
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        
+    def set_data(self, data, dates=None):
+        self.data = data
+        if dates:
+            self.dates = dates
+        self.update()
+        
+    def set_chart_type(self, type_str):
+        self.chart_type = type_str
+        self.update()
         
     def resizeEvent(self, event):
         super().resizeEvent(event)
@@ -275,142 +288,395 @@ class DetailedChartWidget(SparklineWidget):
         super().leaveEvent(event)
         
     def paintEvent(self, event):
-        # 1. Draw Phantom Grid (Behind Chart)
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
         
         width = self.width()
         height = self.height()
         
-        # Phantom Grid (Dashed, 0.1 opacity)
-        grid_pen = QPen(QColor(255, 255, 255, 25), 1, Qt.DashLine) # ~10% opacity
+        # 1. Background & Grid
+        # painter.fillRect(0, 0, width, height, QColor(styles.COLORS['surface'])) # Transparent background
+        
+        # Grid
+        grid_pen = QPen(QColor(255, 255, 255, 25), 1, Qt.DashLine)
         painter.setPen(grid_pen)
-        # Draw some horizontal grid lines
         for i in range(1, 5):
             y = i * (height / 5)
             painter.drawLine(0, int(y), width, int(y))
-        painter.end()
-        
-        # 2. Draw Chart (Sparkline + Fill)
-        super().paintEvent(event)
-        
-        if not self.data or len(self.data) < 2:
-            return
             
-        # 3. Draw Overlays (Axes, Tooltip)
-        painter = QPainter(self)
-        painter.setRenderHint(QPainter.Antialiasing)
-        
-        points = self.calculate_points(width, height)
-        if not points:
+        if not self.data:
+            painter.end()
             return
+
+        # Determine Range
+        if isinstance(self.data[0], dict): # OHLC Data
+            min_val = min(d['low'] for d in self.data)
+            max_val = max(d['high'] for d in self.data)
+            data_len = len(self.data)
+        else: # Simple Line Data
+            min_val = min(self.data)
+            max_val = max(self.data)
+            data_len = len(self.data)
             
-        min_val = min(self.data)
-        max_val = max(self.data)
         val_range = max_val - min_val if max_val != min_val else 1
-        chart_width = width - 15
         
-        # Floating Axis Labels (Monospace, Muted)
+        # Margins
+        margin_top = 20
+        margin_bottom = 30
+        margin_right = 60
+        chart_h = height - margin_top - margin_bottom
+        chart_w = width - margin_right
+        
+        # Helper to map value to Y
+        def map_y(val):
+            return margin_top + chart_h - ((val - min_val) / val_range * chart_h)
+            
+        # Helper to map index to X
+        def map_x(idx):
+            return (idx / (data_len - 1)) * chart_w if data_len > 1 else chart_w / 2
+
+        # 2. Draw Chart
+        if self.chart_type == "CANDLE" and isinstance(self.data[0], dict):
+            # Draw Candlesticks
+            candle_width = max(1, (chart_w / data_len) * 0.6)
+            
+            for i, candle in enumerate(self.data):
+                x = map_x(i)
+                y_open = map_y(candle['open'])
+                y_close = map_y(candle['close'])
+                y_high = map_y(candle['high'])
+                y_low = map_y(candle['low'])
+                
+                is_up = candle['close'] >= candle['open']
+                color = QColor(styles.COLORS['success']) if is_up else QColor(styles.COLORS['danger'])
+                
+                painter.setPen(QPen(color, 1))
+                painter.drawLine(int(x), int(y_high), int(x), int(y_low)) # Wick
+                
+                rect_top = min(y_open, y_close)
+                rect_height = abs(y_close - y_open)
+                if rect_height < 1: rect_height = 1
+                
+                painter.setBrush(color)
+                painter.setPen(Qt.NoPen)
+                painter.drawRect(int(x - candle_width/2), int(rect_top), int(candle_width), int(rect_height))
+                
+        else:
+            # Draw Line Chart
+            path = QPainterPath()
+            fill_path = QPainterPath()
+            
+            # Prepare points
+            points = []
+            for i in range(data_len):
+                val = self.data[i] if not isinstance(self.data[i], dict) else self.data[i]['close']
+                x = map_x(i)
+                y = map_y(val)
+                points.append((x, y))
+                
+            if points:
+                path.moveTo(points[0][0], points[0][1])
+                fill_path.moveTo(points[0][0], height)
+                fill_path.lineTo(points[0][0], points[0][1])
+                
+                for x, y in points[1:]:
+                    path.lineTo(x, y)
+                    fill_path.lineTo(x, y)
+                    
+                fill_path.lineTo(points[-1][0], height)
+                fill_path.closeSubpath()
+                
+                # Gradient Fill
+                color = QColor(styles.COLORS['accent'])
+                gradient = QLinearGradient(0, 0, 0, height)
+                gradient.setColorAt(0, QColor(color.red(), color.green(), color.blue(), 100))
+                gradient.setColorAt(1, QColor(color.red(), color.green(), color.blue(), 0))
+                
+                painter.setBrush(gradient)
+                painter.setPen(Qt.NoPen)
+                painter.drawPath(fill_path)
+                
+                # Line Stroke
+                painter.setBrush(Qt.NoBrush)
+                painter.setPen(QPen(color, 2))
+                painter.drawPath(path)
+
+        # 3. Axes
         painter.setPen(QColor(styles.COLORS['text_secondary']))
         painter.setFont(QFont("Consolas", 8))
         
-        # Y-Axis (Price) - Draw labels on the right side
+        # Y-Axis
         y_steps = 5
-        y_step_val = val_range / y_steps
         for i in range(y_steps + 1):
-            val = min_val + (i * y_step_val)
-            y_pos = height - ((val - min_val) / val_range * (height - 40)) - 20
-            painter.drawText(width - 50, int(y_pos) + 4, f"${val:.2f}")
-        
-        # X-Axis (Date) - Draw labels at the bottom
+            val = min_val + (i * (val_range / y_steps))
+            y = map_y(val)
+            painter.drawText(int(width - 50), int(y) + 4, f"${val:.2f}")
+            
+        # X-Axis
         x_steps = 5
-        x_step_px = chart_width / x_steps
         for i in range(x_steps + 1):
-            x_pos = i * x_step_px
-            # Map index
-            idx = int(i / x_steps * (len(self.data) - 1))
-            if self.dates and idx < len(self.dates):
-                date_str = self.dates[idx][5:] # Remove YYYY- (show MM-DD)
-            else:
-                # Fallback
-                days_ago = int((1 - (i / x_steps)) * 30)
-                date_str = QDateTime.currentDateTime().addDays(-days_ago).toString("MMM dd")
+            idx = int(i * (data_len - 1) / x_steps)
+            x = map_x(idx)
+            
+            date_str = ""
+            if isinstance(self.data[0], dict):
+                date_str = self.data[idx]['date'][5:10] # MM-DD
+            elif self.dates and idx < len(self.dates):
+                date_str = self.dates[idx][5:]
                 
-            painter.drawText(int(x_pos), height - 5, date_str)
+            painter.drawText(int(x) - 15, height - 5, date_str)
 
+        # 4. Cursor / Tooltip
         if self.cursor_pos:
-            # Find nearest point
-            mouse_x = self.cursor_pos.x()
-            nearest_idx = min(range(len(points)), key=lambda i: abs(points[i][0] - mouse_x))
-            nx, ny = points[nearest_idx]
+            mx = self.cursor_pos.x()
+            # Find nearest index
+            idx = int((mx / chart_w) * (data_len - 1))
+            idx = max(0, min(idx, data_len - 1))
             
-            # 1. Crosshairs (Dashed, Glow)
-            pen = QPen(QColor("white"), 1, Qt.DashLine)
-            painter.setPen(pen)
-            painter.drawLine(int(nx), 0, int(nx), height - 20) # Vertical, stop at x-axis
-            painter.drawLine(0, int(ny), width - 50, int(ny))  # Horizontal, stop at y-axis
+            x = map_x(idx)
             
-            # 2. Halo Marker
-            painter.setBrush(Qt.NoBrush)
-            halo_pen = QPen(QColor("white"), 2)
-            painter.setPen(halo_pen)
-            painter.drawEllipse(int(nx - 6), int(ny - 6), 12, 12)
+            # Draw Crosshair
+            painter.setPen(QPen(QColor("white"), 1, Qt.DashLine))
+            painter.drawLine(int(x), 0, int(x), height - margin_bottom)
             
-            painter.setBrush(QColor("white"))
-            painter.setPen(Qt.NoPen)
-            painter.drawEllipse(int(nx - 3), int(ny - 3), 6, 6)
-            
-            # 3. Tooltip (OHLC Style)
-            # Determine color based on price change from open (first point)
-            price = self.data[nearest_idx]
-            start_price = self.data[0]
-            is_up = price >= start_price
-            border_color = styles.COLORS["accent"] if is_up else styles.COLORS["danger"]
-            
-            # Mock OHLC Data (since we only have close prices in self.data)
-            # In a real app, we'd look up the full OHLC record.
-            # For now, we simulate a small range around the close price.
-            open_p = price * 0.998
-            high_p = price * 1.005
-            low_p = price * 0.995
-            close_p = price
-            
-            # Dynamic Date Calculation
-            date_display = "N/A"
-            if self.dates and nearest_idx < len(self.dates):
-                 date_display = self.dates[nearest_idx]
+            # Draw Tooltip
+            if isinstance(self.data[0], dict):
+                candle = self.data[idx]
+                lines = [
+                    f"Date: {candle['date']}",
+                    f"Open: {candle['open']:.2f}",
+                    f"High: {candle['high']:.2f}",
+                    f"Low:  {candle['low']:.2f}",
+                    f"Close:{candle['close']:.2f}"
+                ]
+                val = candle['close']
             else:
-                 days_from_end = len(self.data) - 1 - nearest_idx
-                 date_display = QDateTime.currentDateTime().addDays(-days_from_end).toString('MMM dd, yyyy')
+                val = self.data[idx]
+                date_str = self.dates[idx] if self.dates and idx < len(self.dates) else "N/A"
+                lines = [
+                    f"Date: {date_str}",
+                    f"Price: {val:.2f}"
+                ]
+                
+            y = map_y(val)
+            painter.drawLine(0, int(y), width - margin_right, int(y))
             
-            tooltip_lines = [
-                f"DATE:  {date_display}", 
-                f"OPEN:  ${open_p:.2f}",
-                f"HIGH:  ${high_p:.2f}",
-                f"LOW:   ${low_p:.2f}",
-                f"CLOSE: ${close_p:.2f}"
-            ]
+            # Tooltip Box
+            tw, th = 140, 20 * len(lines) + 10
+            tx = x + 10 if x + 10 + tw < width else x - 10 - tw
+            ty = y - th - 10 if y - th - 10 > 0 else y + 10
             
-            # Draw Tooltip Box
-            rect_w, rect_h = 160, 100
-            rect_x = nx + 15 if nx + 15 + rect_w < width else nx - 15 - rect_w
-            rect_y = ny - 50 if ny - 50 > 0 else ny + 20
-            # Ensure y stays within bounds
-            if rect_y + rect_h > height: rect_y = height - rect_h - 10
-            if rect_y < 0: rect_y = 10
+            painter.setBrush(QColor(30, 30, 30, 230))
+            painter.setPen(QPen(QColor(styles.COLORS['border']), 1))
+            painter.drawRoundedRect(int(tx), int(ty), int(tw), int(th), 5, 5)
             
-            painter.setBrush(QColor("#1E1E20"))
-            painter.setPen(QPen(QColor(border_color), 1))
-            painter.drawRoundedRect(int(rect_x), int(rect_y), rect_w, rect_h, 6, 6)
-            
-            # Text
             painter.setPen(QColor("white"))
-            painter.setFont(QFont("Consolas", 9, QFont.Bold))
+            for i, line in enumerate(lines):
+                painter.drawText(int(tx) + 10, int(ty) + 20 + (i*18), line)
+                
+        painter.end()
+
+class ComparisonWidget(QFrame):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setStyleSheet(f"""
+            QFrame {{
+                background-color: {styles.COLORS['surface']};
+                border: 1px solid {styles.COLORS['surface_light']};
+                border-radius: 8px;
+            }}
+            QLabel {{ border: none; }}
+        """)
+        
+        layout = QVBoxLayout(self)
+        
+        # Header
+        header = QLabel("COMPARATIVE ANALYSIS")
+        header.setStyleSheet(f"font-family: {styles.FONTS['primary']}; font-size: 14px; font-weight: bold; color: {styles.COLORS['accent']};")
+        layout.addWidget(header)
+        
+        # Tabs for Table vs Heatmap
+        self.tabs = QTabWidget()
+        self.tabs.setStyleSheet(f"""
+            QTabWidget::pane {{ border: none; }}
+            QTabBar::tab {{
+                background: {styles.COLORS['surface_light']};
+                color: {styles.COLORS['text_secondary']};
+                padding: 8px 16px;
+                border-top-left-radius: 4px;
+                border-top-right-radius: 4px;
+            }}
+            QTabBar::tab:selected {{
+                background: {styles.COLORS['accent']};
+                color: white;
+            }}
+        """)
+        
+        # 1. Performance Table
+        self.perf_table = QTableWidget()
+        self.perf_table.setColumnCount(6)
+        self.perf_table.setHorizontalHeaderLabels(["Symbol", "1D", "1W", "1M", "YTD", "1Y"])
+        self.perf_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.perf_table.verticalHeader().setVisible(False)
+        self.perf_table.setStyleSheet(f"""
+            QTableWidget {{
+                background-color: transparent;
+                gridline-color: {styles.COLORS['surface_light']};
+                color: white;
+            }}
+            QHeaderView::section {{
+                background-color: {styles.COLORS['surface_light']};
+                color: {styles.COLORS['text_secondary']};
+                border: none;
+                padding: 4px;
+            }}
+        """)
+        self.tabs.addTab(self.perf_table, "Performance")
+        
+        # 2. Correlation Heatmap (Simplified as Table for now)
+        self.corr_table = QTableWidget()
+        self.corr_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.corr_table.verticalHeader().setVisible(True)
+        self.corr_table.setStyleSheet(self.perf_table.styleSheet())
+        self.tabs.addTab(self.corr_table, "Correlation")
+        
+        layout.addWidget(self.tabs)
+        
+    def set_data(self, data):
+        if not data: return
+        
+        # 1. Performance
+        perf_data = data.get('performance', [])
+        self.perf_table.setRowCount(len(perf_data))
+        
+        for i, row in enumerate(perf_data):
+            self.perf_table.setItem(i, 0, QTableWidgetItem(row['symbol']))
             
-            y_offset = rect_y + 20
-            for line in tooltip_lines:
-                painter.drawText(int(rect_x) + 10, int(y_offset), line)
-                y_offset += 16
+            keys = ['1d', '1w', '1m', 'ytd', '1y']
+            for j, key in enumerate(keys):
+                val = row.get(key, 0.0)
+                item = QTableWidgetItem(f"{val:+.2f}%")
+                
+                color = styles.COLORS['success'] if val > 0 else styles.COLORS['danger']
+                item.setForeground(QColor(color))
+                item.setTextAlignment(Qt.AlignCenter)
+                self.perf_table.setItem(i, j+1, item)
+                
+        # 2. Correlation
+        corr_matrix = data.get('correlation', {})
+        symbols = list(corr_matrix.keys())
+        
+        self.corr_table.setRowCount(len(symbols))
+        self.corr_table.setColumnCount(len(symbols))
+        self.corr_table.setHorizontalHeaderLabels(symbols)
+        self.corr_table.setVerticalHeaderLabels(symbols)
+        
+        for i, sym1 in enumerate(symbols):
+            for j, sym2 in enumerate(symbols):
+                val = corr_matrix[sym1].get(sym2, 0.0)
+                item = QTableWidgetItem(f"{val:.2f}")
+                item.setTextAlignment(Qt.AlignCenter)
+                
+                # Colorize
+                if val > 0.8:
+                    bg = QColor(styles.COLORS['success'])
+                    bg.setAlpha(100)
+                    item.setBackground(bg)
+                elif val < 0:
+                    bg = QColor(styles.COLORS['danger'])
+                    bg.setAlpha(50)
+                    item.setBackground(bg)
+                    
+                self.corr_table.setItem(i, j, item)
+
+class FundamentalAnalysisView(QFrame):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setStyleSheet(f"""
+            QFrame {{
+                background-color: {styles.COLORS['surface']};
+                border: 1px solid {styles.COLORS['surface_light']};
+                border-radius: 8px;
+            }}
+            QLabel {{ border: none; }}
+        """)
+        
+        layout = QVBoxLayout(self)
+        
+        # Header
+        header = QLabel("FUNDAMENTAL ANALYSIS")
+        header.setStyleSheet(f"font-family: {styles.FONTS['primary']}; font-size: 14px; font-weight: bold; color: {styles.COLORS['accent']};")
+        layout.addWidget(header)
+        
+        # Content Grid
+        self.grid = QGridLayout()
+        self.grid.setSpacing(15)
+        layout.addLayout(self.grid)
+        
+        # Metrics to display
+        self.metrics = {
+            "Valuation": [
+                ("P/E Ratio", "pe"), ("Forward P/E", "fpe"), ("PEG Ratio", "peg"),
+                ("P/S Ratio", "ps"), ("P/B Ratio", "pb"), ("Market Cap", "mkt_cap")
+            ],
+            "Profitability": [
+                ("Gross Margin", "gross_margin"), ("Operating Margin", "op_margin"),
+                ("Net Margin", "net_margin"), ("ROE", "roe")
+            ],
+            "Growth": [
+                ("Revenue Growth", "rev_growth"), ("Earnings Growth", "earn_growth")
+            ]
+        }
+        
+        self.labels = {}
+        
+        row = 0
+        for category, items in self.metrics.items():
+            # Category Header
+            cat_label = QLabel(category.upper())
+            cat_label.setStyleSheet(f"color: {styles.COLORS['text_secondary']}; font-size: 10px; font-weight: bold; margin-top: 10px;")
+            self.grid.addWidget(cat_label, row, 0, 1, 2)
+            row += 1
+            
+            for label, key in items:
+                # Label
+                lbl = QLabel(label)
+                lbl.setStyleSheet(f"color: {styles.COLORS['text_secondary']}; font-size: 12px;")
+                self.grid.addWidget(lbl, row, 0)
+                
+                # Value
+                val_lbl = QLabel("--")
+                val_lbl.setStyleSheet("color: white; font-size: 12px; font-weight: bold;")
+                val_lbl.setAlignment(Qt.AlignRight)
+                self.grid.addWidget(val_lbl, row, 1)
+                
+                self.labels[key] = val_lbl
+                row += 1
+                
+        layout.addStretch()
+        
+    def set_data(self, data):
+        if not data: return
+        
+        for key, label_widget in self.labels.items():
+            val = data.get(key, 0)
+            
+            # Format based on key
+            if key == 'mkt_cap':
+                if val > 1e12: text = f"${val/1e12:.2f}T"
+                elif val > 1e9: text = f"${val/1e9:.2f}B"
+                elif val > 1e6: text = f"${val/1e6:.2f}M"
+                else: text = f"${val:,.0f}"
+            elif 'margin' in key or 'growth' in key or 'roe' in key:
+                text = f"{val}%"
+                if val > 0: label_widget.setStyleSheet(f"color: {styles.COLORS['success']}; font-weight: bold;")
+                elif val < 0: label_widget.setStyleSheet(f"color: {styles.COLORS['danger']}; font-weight: bold;")
+                else: label_widget.setStyleSheet("color: white; font-weight: bold;")
+            else:
+                text = f"{val:.2f}"
+                label_widget.setStyleSheet("color: white; font-weight: bold;")
+                
+            label_widget.setText(text)
 
 class TickerCard(QFrame):
     clicked = Signal(str)
@@ -710,6 +976,30 @@ class DetailedAnalysisView(QWidget):
                 btn.setChecked(True)
                 
         card_layout.addLayout(control_header)
+        
+        # Chart Controls
+        chart_controls = QHBoxLayout()
+        chart_controls.setContentsMargins(0, 0, 0, 0)
+        
+        self.chart_type_combo = QComboBox()
+        self.chart_type_combo.addItems(["CANDLE", "LINE"])
+        self.chart_type_combo.setCursor(Qt.PointingHandCursor)
+        self.chart_type_combo.setStyleSheet(f"""
+            QComboBox {{
+                background-color: {styles.COLORS['surface_light']};
+                color: white;
+                border: none;
+                border-radius: 4px;
+                padding: 4px 8px;
+                font-weight: bold;
+            }}
+            QComboBox::drop-down {{ border: none; }}
+        """)
+        self.chart_type_combo.currentTextChanged.connect(self.on_chart_type_changed)
+        chart_controls.addWidget(self.chart_type_combo)
+        chart_controls.addStretch()
+        
+        card_layout.addLayout(chart_controls)
 
         # 3. Chart Visualization
         self.chart = DetailedChartWidget([100, 105, 102, 108, 107, 110, 115]) 
@@ -729,6 +1019,17 @@ class DetailedAnalysisView(QWidget):
         card_layout.addWidget(self.news_timeline)
         
         self.layout.addWidget(self.card)
+        
+        # 5. Comparative Analysis
+        self.comparison_widget = ComparisonWidget()
+        self.layout.addWidget(self.comparison_widget)
+        
+        # 6. Fundamental Analysis
+        self.fundamental_widget = FundamentalAnalysisView()
+        self.layout.addWidget(self.fundamental_widget)
+
+    def on_chart_type_changed(self, text):
+        self.chart.set_chart_type(text)
 
     def on_timeframe_changed(self, btn):
         tf = btn.text()
@@ -758,19 +1059,14 @@ class DetailedAnalysisView(QWidget):
             interval = "1mo" # Monthly candles for max history
             
         # Fetch new data
-        # Note: In a real app, we should run this in a background thread to avoid freezing UI
-        # For now, we'll do it synchronously but show a loading state if possible
         QApplication.setOverrideCursor(Qt.WaitCursor)
         try:
             symbol = self.ticker_label.text()
-            data = data_service.fetch_stock_data(symbol, period=period, interval=interval)
             
-            if data and data.get('history'):
-                self.chart.data = data['history']
-                self.chart.dates = data.get('history_dates', [])
-                self.chart._progress = 0.0
-                self.chart.timer.start(16)
-                self.chart.update()
+            # Use new OHLC fetcher
+            ohlc_data = data_service.fetch_detailed_ohlc_data(symbol, period=period, interval=interval)
+            self.chart.set_data(ohlc_data)
+            
         finally:
             QApplication.restoreOverrideCursor()
 
@@ -796,11 +1092,18 @@ class DetailedAnalysisView(QWidget):
             self.change_label.setStyleSheet(f"background-color: {styles.COLORS['danger']}20; color: {styles.COLORS['danger']}; border-radius: 12px; padding: 4px 12px; font-weight: bold;")
 
         # Update Chart
-        self.chart.data = data.get('history', [])
-        self.chart.dates = data.get('history_dates', [])
-        self.chart._progress = 0.0 # Reset animation
-        self.chart.timer.start(16) # Restart animation
-        self.chart.update()
+        # Update Chart (Initial Load)
+        # Default to 1M view
+        ohlc_data = data_service.fetch_detailed_ohlc_data(data['symbol'], period="1mo", interval="1d")
+        self.chart.set_data(ohlc_data)
+        
+        # Update Comparison
+        comp_data = data_service.get_comparison_data(data['symbol'])
+        self.comparison_widget.set_data(comp_data)
+        
+        # Update Fundamentals
+        fund_data = data_service.fetch_fundamentals(data['symbol'])
+        self.fundamental_widget.set_data(fund_data)
         
         # Load News
         self.news_timeline.load_news(data['symbol'])

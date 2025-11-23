@@ -141,7 +141,7 @@ def generate_mock_data(symbol):
         'change_percent': change_percent,
         'name': STOCK_NAMES.get(symbol, symbol),
         'history': history,
-        'history_dates': [(datetime.datetime.now() - datetime.timedelta(days=30-i)).strftime("%Y-%m-%d") for i in range(31)],
+        'history_dates': [(datetime.now() - timedelta(days=30-i)).strftime("%Y-%m-%d") for i in range(31)],
         'timestamps': ['9:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00'],
         'rvol': random.uniform(0.5, 3.0),
         'open': base_price * (1 + (random.random() - 0.5) * 0.02),
@@ -1166,6 +1166,33 @@ def analyze_sector_rotation():
         print(f"Error analyzing sectors: {e}")
         return []
 
+def get_earnings_calendar(days=7):
+    """
+    Fetches upcoming earnings for the coverage universe.
+    """
+    upcoming = []
+    for sym in SAMPLE_STOCKS:
+        try:
+            ticker = yf.Ticker(sym)
+            cal = ticker.calendar
+            if cal and 'Earnings Date' in cal:
+                dates = cal.get('Earnings Date', [])
+                if dates:
+                    next_date = dates[0]
+                    days_until = (next_date - datetime.now().date()).days
+                    
+                    if 0 <= days_until <= days:
+                        upcoming.append({
+                            'symbol': sym,
+                            'date': next_date.strftime('%Y-%m-%d'),
+                            'days_until': days_until
+                        })
+        except:
+            continue
+            
+    upcoming.sort(key=lambda x: x['days_until'])
+    return upcoming
+
 def save_opportunity_to_history(opportunity):
     """
     Saves a generated opportunity to a history JSON file.
@@ -1226,7 +1253,6 @@ def analyze_portfolio_correlation(symbols):
         corr_matrix = df.corr()
         
         # Calculate average off-diagonal correlation
-        # Sum of all values minus diagonal (1s) divided by number of off-diagonal elements
         n = len(df.columns)
         if n < 2: return 0.0
         
@@ -1239,35 +1265,108 @@ def analyze_portfolio_correlation(symbols):
         print(f"Error calculating correlation: {e}")
         return 0.0
 
-def get_earnings_calendar(days=7):
+def fetch_detailed_ohlc_data(symbol, period="1mo", interval="1d"):
     """
-    Fetches upcoming earnings for the coverage universe.
+    Fetches detailed OHLC data for advanced charting.
+    Returns a list of dictionaries suitable for candlestick rendering.
     """
-    # In a real app with a paid API, we'd query a calendar endpoint.
-    # yfinance calendar is per-ticker and can be slow/unreliable for scanning.
-    # We will scan the SAMPLE_STOCKS list.
+    try:
+        ticker = yf.Ticker(symbol)
+        history = ticker.history(period=period, interval=interval)
+        
+        if history.empty:
+            return []
+            
+        data = []
+        for date, row in history.iterrows():
+            data.append({
+                'date': date.strftime("%Y-%m-%d %H:%M"),
+                'open': row['Open'],
+                'high': row['High'],
+                'low': row['Low'],
+                'close': row['Close'],
+                'volume': row['Volume']
+            })
+            
+        return data
+    except Exception as e:
+        print(f"Error fetching OHLC data for {symbol}: {e}")
+        return []
+
+def get_comparison_data(target_symbol, comparison_symbols=None):
+    """
+    Fetches performance data for target symbol and a list of comparison symbols.
+    Calculates returns for 1D, 1W, 1M, YTD, 1Y.
+    Calculates correlation matrix.
+    """
+    if comparison_symbols is None:
+        comparison_symbols = ['^GSPC', 'XLK'] # Default to S&P 500 and Tech Sector
+        
+    all_symbols = [target_symbol] + comparison_symbols
     
-    upcoming = []
-    for sym in SAMPLE_STOCKS:
+    performance_data = []
+    
+    # 1. Fetch Performance Stats
+    for sym in all_symbols:
         try:
             ticker = yf.Ticker(sym)
-            # This is slow, so in production we'd cache this heavily
-            # For demo, we might mock or limit to top 5
-            cal = ticker.calendar
-            if cal and 'Earnings Date' in cal:
-                dates = cal.get('Earnings Date', [])
-                if dates:
-                    next_date = dates[0]
-                    days_until = (next_date - datetime.now().date()).days
-                    
-                    if 0 <= days_until <= days:
-                        upcoming.append({
-                            'symbol': sym,
-                            'date': next_date.strftime('%Y-%m-%d'),
-                            'days_until': days_until
-                        })
-        except:
-            continue
+            hist = ticker.history(period="1y")
             
-    upcoming.sort(key=lambda x: x['days_until'])
-    return upcoming
+            if hist.empty:
+                continue
+                
+            current_price = hist['Close'].iloc[-1]
+            
+            # Helper to get return
+            def get_return(days):
+                if len(hist) > days:
+                    prev = hist['Close'].iloc[-days-1]
+                    return ((current_price - prev) / prev) * 100
+                return 0.0
+                
+            # YTD
+            current_year = datetime.now().year
+            ytd_start = f"{current_year-1}-12-31"
+            ytd_hist = hist.loc[ytd_start:]
+            ytd_return = 0.0
+            if not ytd_hist.empty:
+                ytd_open = ytd_hist['Close'].iloc[0]
+                ytd_return = ((current_price - ytd_open) / ytd_open) * 100
+                
+            stats = {
+                'symbol': sym,
+                'name': STOCK_NAMES.get(sym, sym),
+                '1d': get_return(1),
+                '1w': get_return(5),
+                '1m': get_return(21),
+                'ytd': ytd_return,
+                '1y': get_return(252)
+            }
+            performance_data.append(stats)
+            
+        except Exception as e:
+            print(f"Error fetching comparison data for {sym}: {e}")
+            
+    # 2. Calculate Correlation Matrix
+    correlation_matrix = {}
+    try:
+        # Download batch data for correlation
+        batch_data = yf.download(all_symbols, period="1y", progress=False)['Close']
+        corr_df = batch_data.corr()
+        
+        # Convert to dictionary format: {'AAPL': {'MSFT': 0.8, ...}, ...}
+        for sym1 in all_symbols:
+            correlation_matrix[sym1] = {}
+            for sym2 in all_symbols:
+                if sym1 in corr_df and sym2 in corr_df:
+                    correlation_matrix[sym1][sym2] = corr_df.loc[sym1, sym2] if sym1 != sym2 else 1.0
+                else:
+                    correlation_matrix[sym1][sym2] = 0.0
+                    
+    except Exception as e:
+        print(f"Error calculating correlation matrix: {e}")
+        
+    return {
+        'performance': performance_data,
+        'correlation': correlation_matrix
+    }

@@ -1,5 +1,5 @@
 import sys
-from PySide6.QtWidgets import QApplication, QMainWindow, QScrollArea, QWidget, QVBoxLayout
+from PySide6.QtWidgets import QApplication, QMainWindow
 from ui_components import DetailedAnalysisView
 import data_service
 
@@ -10,31 +10,25 @@ mock_data = {
     'price': 150.00,
     'change': 1.50,
     'change_percent': 1.00,
-    'history': [],
+    'history': [], # Will be fetched by set_data
     'history_dates': []
 }
 
-def verify_fundamentals():
+def verify_charting():
     app = QApplication(sys.argv)
     
     window = QMainWindow()
-    
-    # Create a scroll area to host the view because it's tall
-    scroll = QScrollArea()
-    scroll.setWidgetResizable(True)
-    
     view = DetailedAnalysisView()
-    scroll.setWidget(view)
-    
-    window.setCentralWidget(scroll)
-    window.resize(1200, 1000)
+    window.setCentralWidget(view)
+    window.resize(1200, 800)
     window.show()
     
+    # Simulate data loading
     print("Setting data...")
     view.set_data(mock_data)
-    print("Data set. Check Fundamental Analysis section.")
+    print("Data set.")
     
     sys.exit(app.exec())
 
 if __name__ == "__main__":
-    verify_fundamentals()
+    verify_charting()
