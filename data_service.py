@@ -68,6 +68,39 @@ STOCK_NAMES = {
     'PYPL': 'PayPal Holdings Inc.', 'CSCO': 'Cisco Systems Inc.', 'PFE': 'Pfizer Inc.'
 }
 
+SECTOR_ETF_TO_NAME = {
+    'XLK': 'Technology', 'XLF': 'Financials', 'XLE': 'Energy',
+    'XLV': 'Healthcare', 'XLI': 'Industrials', 'XLP': 'Staples',
+    'XLU': 'Utilities', 'XLY': 'Discretionary', 'XLB': 'Materials',
+    'XLC': 'Communication', 'IYR': 'Real Estate'
+}
+
+# Mapping of individual stocks to their sector ETF (for aggregation)
+SYMBOL_TO_SECTOR = {
+    # Technology (XLK)
+    'AAPL': 'XLK', 'MSFT': 'XLK', 'NVDA': 'XLK', 'ADBE': 'XLK', 'CRM': 'XLK', 'CSCO': 'XLK', 'INTC': 'XLK', 'AMD': 'XLK', 'ORCL': 'XLK', 'IBM': 'XLK',
+    # Financials (XLF)
+    'JPM': 'XLF', 'BAC': 'XLF', 'WFC': 'XLF', 'C': 'XLF', 'GS': 'XLF', 'MS': 'XLF', 'BLK': 'XLF', 'AXP': 'XLF', 'V': 'XLF', 'MA': 'XLF', 'BRK-B': 'XLF',
+    # Healthcare (XLV)
+    'UNH': 'XLV', 'JNJ': 'XLV', 'LLY': 'XLV', 'MRK': 'XLV', 'ABBV': 'XLV', 'TMO': 'XLV', 'PFE': 'XLV', 'ABT': 'XLV', 'DHR': 'XLV', 'BMY': 'XLV',
+    # Consumer Discretionary (XLY)
+    'AMZN': 'XLY', 'TSLA': 'XLY', 'HD': 'XLY', 'MCD': 'XLY', 'NKE': 'XLY', 'SBUX': 'XLY', 'LOW': 'XLY', 'BKNG': 'XLY', 'TJX': 'XLY',
+    # Communication Services (XLC)
+    'GOOGL': 'XLC', 'GOOG': 'XLC', 'META': 'XLC', 'NFLX': 'XLC', 'DIS': 'XLC', 'CMCSA': 'XLC', 'TMUS': 'XLC', 'VZ': 'XLC', 'T': 'XLC',
+    # Industrials (XLI)
+    'CAT': 'XLI', 'GE': 'XLI', 'HON': 'XLI', 'UNP': 'XLI', 'UPS': 'XLI', 'BA': 'XLI', 'LMT': 'XLI', 'RTX': 'XLI', 'DE': 'XLI', 'MMM': 'XLI',
+    # Consumer Staples (XLP)
+    'PG': 'XLP', 'COST': 'XLP', 'PEP': 'XLP', 'KO': 'XLP', 'WMT': 'XLP', 'PM': 'XLP', 'MO': 'XLP', 'CL': 'XLP', 'TGT': 'XLP',
+    # Energy (XLE)
+    'XOM': 'XLE', 'CVX': 'XLE', 'COP': 'XLE', 'SLB': 'XLE', 'EOG': 'XLE', 'MPC': 'XLE', 'PSX': 'XLE', 'VLO': 'XLE', 'OXY': 'XLE',
+    # Utilities (XLU)
+    'NEE': 'XLU', 'DUK': 'XLU', 'SO': 'XLU', 'AEP': 'XLU', 'SRE': 'XLU', 'D': 'XLU', 'PEG': 'XLU', 'ED': 'XLU',
+    # Real Estate (IYR)
+    'PLD': 'IYR', 'AMT': 'IYR', 'EQIX': 'IYR', 'CCI': 'IYR', 'PSA': 'IYR', 'O': 'IYR', 'SPG': 'IYR', 'WELL': 'IYR',
+    # Materials (XLB)
+    'LIN': 'XLB', 'SHW': 'XLB', 'APD': 'XLB', 'FCX': 'XLB', 'ECL': 'XLB', 'NEM': 'XLB', 'DOW': 'XLB', 'DD': 'XLB', 'PPG': 'XLB'
+}
+
 # --- Caching Layer ---
 DATA_CACHE = {}
 PENDING_REQUESTS = {}
@@ -500,20 +533,6 @@ def calculate_atr(symbol, period=14):
     except:
         return 1.0
 
-# --- Symbol to Sector Mapping ---
-SYMBOL_TO_SECTOR = {
-    'AAPL': 'XLK', 'MSFT': 'XLK', 'NVDA': 'XLK', 'AMD': 'XLK', 'ADBE': 'XLK', 'CRM': 'XLK', 'CSCO': 'XLK', 'INTC': 'XLK',
-    'GOOGL': 'XLC', 'META': 'XLC', 'NFLX': 'XLC', 'DIS': 'XLC',
-    'AMZN': 'XLY', 'TSLA': 'XLY', 'HD': 'XLY', 'MCD': 'XLY', 'NKE': 'XLY',
-    'JPM': 'XLF', 'BAC': 'XLF', 'V': 'XLF', 'MA': 'XLF', 'BRK-B': 'XLF',
-    'UNH': 'XLV', 'JNJ': 'XLV', 'PFE': 'XLV', 'LLY': 'XLV', 'MRK': 'XLV',
-    'XOM': 'XLE', 'CVX': 'XLE',
-    'PG': 'XLP', 'WMT': 'XLP', 'KO': 'XLP', 'PEP': 'XLP',
-    'BA': 'XLI', 'CAT': 'XLI', 'GE': 'XLI', 'HON': 'XLI',
-    'LIN': 'XLB', 'SHW': 'XLB',
-    'NEE': 'XLU', 'DUK': 'XLU'
-}
-
 def generate_narrative(symbol, indicators=None):
     """
     Generates a narrative based on REAL technical indicators.
@@ -603,6 +622,12 @@ def get_opportunities(risk_profile="BALANCED", settings=None):
     """
     if settings is None:
         settings = load_settings()
+        
+    # Check Cache
+    cache_key = f"opportunities_{risk_profile}"
+    cached = get_cached_data(cache_key, max_age_seconds=300)
+    if cached:
+        return cached
         
     # 1. Filter Pool based on mock risk profile mapping (simplified)
     pool = list(STOCK_NAMES.keys())
@@ -755,7 +780,9 @@ def get_opportunities(risk_profile="BALANCED", settings=None):
     scored_opps.sort(key=lambda x: (x['is_match'], x['is_rvol_ok'], x['opp_score']), reverse=True)
     
     # Return top 10 (guarantees at least 3 if pool has 3 valid stocks)
-    return scored_opps[:10]
+    result = scored_opps[:10]
+    set_cached_data(cache_key, result)
+    return result
 
 def get_sector_data(sector_name):
     """
@@ -787,10 +814,9 @@ def get_sector_data(sector_name):
         print(f"Error fetching sector data: {e}")
         return None
 
-def get_sector_top_performers(sector_name, limit=5):
+def get_sector_performers(sector_name, limit=3):
     """
-    Returns top performing stocks in a sector.
-    For now, returns a sample list based on the sector mapping.
+    Returns top and bottom performing stocks in a sector.
     """
     SECTOR_NAME_TO_ETF = {v: k for k, v in SECTOR_ETF_TO_NAME.items()}
     etf = SECTOR_NAME_TO_ETF.get(sector_name)
@@ -799,12 +825,18 @@ def get_sector_top_performers(sector_name, limit=5):
     sector_symbols = [s for s, e in SYMBOL_TO_SECTOR.items() if e == etf]
     
     # If we don't have enough, add some big names based on sector
-    if len(sector_symbols) < 3:
-        if sector_name == 'Technology': sector_symbols.extend(['AAPL', 'MSFT', 'NVDA', 'AMD', 'CRM'])
-        elif sector_name == 'Financials': sector_symbols.extend(['JPM', 'BAC', 'V', 'MA', 'GS'])
-        elif sector_name == 'Healthcare': sector_symbols.extend(['UNH', 'JNJ', 'PFE', 'LLY', 'MRK'])
-        elif sector_name == 'Consumer Discretionary': sector_symbols.extend(['AMZN', 'TSLA', 'HD', 'MCD', 'NKE'])
-        elif sector_name == 'Communication Services': sector_symbols.extend(['GOOGL', 'META', 'NFLX', 'DIS', 'TMUS'])
+    if len(sector_symbols) < 5:
+        if sector_name == 'Technology': sector_symbols.extend(['AAPL', 'MSFT', 'NVDA', 'AMD', 'CRM', 'ADBE', 'INTC'])
+        elif sector_name == 'Financials': sector_symbols.extend(['JPM', 'BAC', 'V', 'MA', 'GS', 'MS', 'WFC'])
+        elif sector_name == 'Healthcare': sector_symbols.extend(['UNH', 'JNJ', 'PFE', 'LLY', 'MRK', 'ABBV', 'TMO'])
+        elif sector_name == 'Consumer Discretionary': sector_symbols.extend(['AMZN', 'TSLA', 'HD', 'MCD', 'NKE', 'SBUX', 'BKNG'])
+        elif sector_name == 'Communication Services': sector_symbols.extend(['GOOGL', 'META', 'NFLX', 'DIS', 'TMUS', 'VZ', 'T'])
+        elif sector_name == 'Energy': sector_symbols.extend(['XOM', 'CVX', 'COP', 'SLB', 'EOG'])
+        elif sector_name == 'Industrials': sector_symbols.extend(['GE', 'CAT', 'UNP', 'HON', 'UPS'])
+        elif sector_name == 'Consumer Staples': sector_symbols.extend(['PG', 'KO', 'PEP', 'WMT', 'COST'])
+        elif sector_name == 'Utilities': sector_symbols.extend(['NEE', 'DUK', 'SO', 'AEP', 'D'])
+        elif sector_name == 'Materials': sector_symbols.extend(['LIN', 'APD', 'SHW', 'FCX', 'NEM'])
+        elif sector_name == 'Real Estate': sector_symbols.extend(['PLD', 'AMT', 'EQIX', 'CCI', 'PSA'])
     
     sector_symbols = list(set(sector_symbols)) # Unique
     
@@ -818,7 +850,106 @@ def get_sector_top_performers(sector_name, limit=5):
                 
     # Sort by performance
     results.sort(key=lambda x: x['change_percent'], reverse=True)
-    return results[:limit][:3]
+    
+    return {
+        'top': results[:limit],
+        'bottom': results[-limit:] if len(results) > limit else []
+    }
+
+def get_all_cached_tickers():
+    """
+    Returns all stock data currently in the cache (Memory + Disk).
+    """
+    tickers = []
+    seen_symbols = set()
+    
+    # 1. Memory Cache
+    for key, entry in DATA_CACHE.items():
+        if "_stock_" in key and isinstance(entry['data'], dict):
+            data = entry['data']
+            if data['symbol'] not in seen_symbols:
+                tickers.append(data)
+                seen_symbols.add(data['symbol'])
+                
+    # 2. Disk Cache (if not in memory)
+    try:
+        if os.path.exists(CACHE_DIR):
+            for filename in os.listdir(CACHE_DIR):
+                if filename.endswith("_stock_data.json"):
+                    symbol = filename.replace("_stock_data.json", "")
+                    if symbol not in seen_symbols:
+                        try:
+                            with open(os.path.join(CACHE_DIR, filename), 'r') as f:
+                                data = json.load(f)
+                                if isinstance(data, dict):
+                                    tickers.append(data)
+                                    seen_symbols.add(symbol)
+                                    # Populate memory cache while we're at it
+                                    set_cached_data(f"{symbol}_stock_1mo_1d", data)
+                        except:
+                            pass
+    except Exception as e:
+        print(f"Error scanning disk cache: {e}")
+        
+    return tickers
+
+def calculate_sector_stats(sector_name, tickers):
+    """
+    Calculates sector stats from a list of ticker data.
+    """
+    if not tickers:
+        return None
+        
+    avg_change = sum(t.get('change_percent', 0.0) for t in tickers) / len(tickers)
+    total_assets = sum(t.get('market_cap', 0) for t in tickers)
+    
+    return {
+        'name': sector_name,
+        'price': 0.0,
+        'change': 0.0,
+        'change_percent': avg_change,
+        'pe': 0.0,
+        'yield': 0.0,
+        'beta': 1.0,
+        'assets': total_assets,
+        'description': f"Sector Index (Aggregated from {len(tickers)} tickers)"
+    }
+
+def get_sector_details_from_tickers(sector_name, all_tickers):
+    """
+    Aggregates sector stats and finds top/bottom performers from a list of ticker data.
+    Avoids new API calls by using existing data.
+    """
+    SECTOR_NAME_TO_ETF = {v: k for k, v in SECTOR_ETF_TO_NAME.items()}
+    target_etf = SECTOR_NAME_TO_ETF.get(sector_name)
+    
+    sector_tickers = []
+    for t in all_tickers:
+        sym = t.get('symbol')
+        # Lookup sector
+        etf = SYMBOL_TO_SECTOR.get(sym)
+        if etf == target_etf:
+            sector_tickers.append(t)
+            
+    if not sector_tickers:
+        return None, {'top': [], 'bottom': []}
+        
+    # Sort by performance
+    sector_tickers.sort(key=lambda x: x.get('change_percent', 0.0), reverse=True)
+    
+    # Top and Bottom
+    top = sector_tickers[:3]
+    bottom = sector_tickers[-3:] if len(sector_tickers) >= 3 else []
+    
+    # Aggregate Stats
+    sector_data = calculate_sector_stats(sector_name, sector_tickers)
+    
+    performers = {
+        'top': top,
+        'bottom': bottom
+    }
+    
+    return sector_data, performers
 
 def get_morning_espresso_narrative():
     """
@@ -1424,7 +1555,6 @@ def save_opportunity_to_history(opportunity):
         print(f"Error saving history: {e}")
 
 def get_idea_history():
-    """Returns the list of saved opportunities."""
     history_file = "idea_history.json"
     if not os.path.exists(history_file):
         return []
@@ -1435,10 +1565,6 @@ def get_idea_history():
         return []
 
 def analyze_portfolio_correlation(symbols):
-    """
-    Calculates correlation matrix for a list of symbols.
-    Returns the average correlation (0-1).
-    """
     if not symbols or len(symbols) < 2:
         return 0.0
         
@@ -1467,10 +1593,6 @@ def analyze_portfolio_correlation(symbols):
         return 0.0
 
 def fetch_detailed_ohlc_data(symbol, period="1mo", interval="1d"):
-    """
-    Fetches detailed OHLC data for advanced charting.
-    Returns a list of dictionaries suitable for candlestick rendering.
-    """
     try:
         ticker = yf.Ticker(symbol)
         history = ticker.history(period=period, interval=interval)
@@ -1495,11 +1617,6 @@ def fetch_detailed_ohlc_data(symbol, period="1mo", interval="1d"):
         return []
 
 def get_comparison_data(target_symbol, comparison_symbols=None):
-    """
-    Fetches performance data for target symbol and a list of comparison symbols.
-    Calculates returns for 1D, 1W, 1M, YTD, 1Y.
-    Calculates correlation matrix.
-    """
     if comparison_symbols is None:
         comparison_symbols = ['^GSPC', 'XLK'] # Default to S&P 500 and Tech Sector
         

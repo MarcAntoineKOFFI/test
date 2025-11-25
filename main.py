@@ -205,9 +205,8 @@ class MainWindow(QMainWindow):
         self.watchlist_card = self.create_watchlist_card()
         col1.addWidget(self.watchlist_card)
         
-        # Fix Layout: Indices compact, Watchlist expands
-        col1.setStretch(0, 0)
-        col1.setStretch(1, 1)
+        # Fix Layout: Compact cards, empty space at bottom
+        col1.addStretch()
         
         self.grid_layout.addLayout(col1, 0, 0)
         
@@ -414,16 +413,46 @@ class MainWindow(QMainWindow):
         self.threadpool.start(worker)
 
     def show_sector(self, sector_name):
-        self.stack.setCurrentWidget(self.sector_view)
-        # Fetch sector data
+        # Create Popup (Store reference to prevent GC)
+        self.sector_popup = ui_components.SectorPopup(sector_name, self)
+        self.sector_popup.ticker_clicked.connect(self.show_detail)
+        
+        # Fetch sector data (Async)
         worker = Worker(self._fetch_sector_data, sector_name)
-        worker.signals.result.connect(lambda data: self.sector_view.set_data(data[0], data[1]))
+        worker.signals.result.connect(lambda data: self._on_sector_data_ready(data))
+        worker.signals.error.connect(lambda err: print(f"ERROR in show_sector: {err}"))
         self.threadpool.start(worker)
         
+        self.sector_popup.show()
+
+    def _on_sector_data_ready(self, data):
+        if self.sector_popup:
+            self.sector_popup.set_data(data[0], data[1])
+        
     def _fetch_sector_data(self, sector_name, progress_callback=None):
+        # 1. Try to get data from existing cache first (fastest, no API)
+        all_tickers = data_service.get_all_cached_tickers()
+        sector_data, performers = data_service.get_sector_details_from_tickers(sector_name, all_tickers)
+        
+        if sector_data and (performers['top'] or performers['bottom']):
+            return (sector_data, performers)
+            
+        # 2. Fallback: Fetch fresh data
+        # Fetch performers (this fetches real data for ~10 stocks)
+        performers = data_service.get_sector_performers(sector_name)
+        
+        # Now try to aggregate again using this fresh data
+        fresh_tickers = performers['top'] + performers['bottom']
+        
+        if fresh_tickers:
+            # Aggregate from fresh tickers
+            sector_data = data_service.calculate_sector_stats(sector_name, fresh_tickers)
+            return (sector_data, performers)
+            
+        # If we still have no tickers, try ETF fetch as last resort
         sector_data = data_service.get_sector_data(sector_name)
-        top_performers = data_service.get_sector_top_performers(sector_name)
-        return sector_data, top_performers
+        return (sector_data, performers)
+
 
     def show_talking_points(self):
         self.stack.setCurrentWidget(self.talking_points_view)
@@ -578,9 +607,7 @@ class MainWindow(QMainWindow):
             self.talking_points_view.sectorClicked.connect(self.show_sector)
         self.stack.addWidget(self.talking_points_view)
         
-        self.sector_view = ui_components.SectorView()
-        self.sector_view.back_clicked.connect(self.show_talking_points)
-        self.stack.addWidget(self.sector_view)
+        # self.sector_view removed (replaced by popup)
         
         self.settings_view = ui_components.SettingsView()
         if hasattr(self.settings_view, 'profile_changed'):

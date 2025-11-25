@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import (QWidget, QLabel, QVBoxLayout, QHBoxLayout, QFrame, 
+from PySide6.QtWidgets import (QWidget, QLabel, QVBoxLayout, QHBoxLayout, QFrame, QDialog, 
                                QGraphicsDropShadowEffect, QSizePolicy, QScrollArea, QPushButton, QGridLayout, 
                                QButtonGroup, QComboBox, QTabWidget, QTableWidget, QHeaderView, QAbstractItemView, 
                                QProgressBar, QCheckBox, QRadioButton, QLineEdit, QTableWidgetItem, QSlider, QSpinBox, QApplication)
@@ -516,6 +516,16 @@ class DetailedChartWidget(QWidget):
 
         # Draw Cached Pixmap
         painter.drawPixmap(0, 0, self.cached_pixmap)
+        # 4. Cursor / Tooltip
+        if self.cursor_pos:
+            mx = self.cursor_pos.x()
+            # Find nearest index
+            idx = int((mx / width) * (data_len - 1))
+            idx = max(0, min(idx, data_len - 1))
+            
+            x = (idx / (data_len - 1)) * width if data_len > 1 else width / 2
+            
+            # Draw Crosshair
             painter.setPen(QPen(QColor("white"), 1, Qt.DashLine))
             painter.drawLine(int(x), 0, int(x), height)
             
@@ -767,60 +777,61 @@ class TickerCard(QFrame):
         self.symbol = data['symbol']
         self.setObjectName("Card")
         self.setCursor(Qt.PointingHandCursor)
-        self.setFixedHeight(80)
+        self.setStyleSheet(f"""
+            #Card {{
+                background-color: {styles.COLORS['surface_light']};
+                border-radius: 12px;
+                border: 1px solid {styles.COLORS['surface_light']};
+            }}
+            #Card:hover {{
+                border: 1px solid {styles.COLORS['accent']};
+                background-color: {styles.COLORS['surface']};
+            }}
+        """)
         
-        layout = QHBoxLayout(self)
-        layout.setContentsMargins(15, 10, 15, 10)
-        layout.setSpacing(15)
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(15, 20, 15, 20)
+        layout.setSpacing(10)
         
-        self.logo = LogoWidget(self.symbol, size=50)
-        layout.addWidget(self.logo)
+        # Logo
+        self.logo = LogoWidget(self.symbol, size=60)
+        layout.addWidget(self.logo, alignment=Qt.AlignCenter)
         
-        text_layout = QVBoxLayout()
-        text_layout.setSpacing(2)
+        # Ticker
+        self.ticker_label = QLabel(self.symbol)
+        self.ticker_label.setStyleSheet("color: white; font-weight: 900; font-size: 20px; border: none; background: transparent;")
+        self.ticker_label.setAlignment(Qt.AlignCenter)
+        layout.addWidget(self.ticker_label)
         
-        ticker_label = QLabel(self.symbol)
-        ticker_label.setStyleSheet("color: white; font-weight: bold; font-size: 14px; border: none; background: transparent;")
-        text_layout.addWidget(ticker_label)
+        # Name
+        self.name_label = QLabel(data['name'])
+        self.name_label.setStyleSheet(f"color: {styles.COLORS['text_secondary']}; font-size: 12px; border: none; background: transparent;")
+        self.name_label.setAlignment(Qt.AlignCenter)
+        self.name_label.setWordWrap(False)
+        font_metrics = self.name_label.fontMetrics()
+        elided_name = font_metrics.elidedText(data['name'], Qt.ElideRight, 130)
+        self.name_label.setText(elided_name)
+        layout.addWidget(self.name_label)
         
-        name_label = QLabel(data['name'])
-        name_label.setStyleSheet(f"color: {styles.COLORS['text_secondary']}; font-size: 11px; border: none; background: transparent;")
-        name_label.setWordWrap(False)
-        font_metrics = name_label.fontMetrics()
-        elided_name = font_metrics.elidedText(data['name'], Qt.ElideRight, 150)
-        name_label.setText(elided_name)
+        layout.addStretch()
         
-        text_layout.addWidget(name_label)
-        layout.addLayout(text_layout)
-        
-        # Price & Change (Added as requested)
-        price_layout = QVBoxLayout()
-        price_layout.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        price_layout.setSpacing(2)
-        
+        # Price
         price_val = data.get('price', 0.0)
+        self.price_lbl = QLabel(f"${price_val:.2f}")
+        self.price_lbl.setStyleSheet("color: white; font-weight: bold; font-size: 18px; border: none; background: transparent;")
+        self.price_lbl.setAlignment(Qt.AlignCenter)
+        layout.addWidget(self.price_lbl)
+        
+        # Change
         change_val = data.get('change', 0.0)
         change_pct = data.get('change_percent', 0.0)
-        
-        self.price_lbl = QLabel(f"${price_val:.2f}")
-        self.price_lbl.setStyleSheet("color: white; font-weight: bold; font-size: 14px; border: none; background: transparent;")
-        self.price_lbl.setAlignment(Qt.AlignRight)
         
         sign = "+" if change_val >= 0 else ""
         color = styles.COLORS['success'] if change_val >= 0 else styles.COLORS['danger']
         self.change_lbl = QLabel(f"{sign}{change_val:.2f} ({sign}{change_pct:.2f}%)")
-        self.change_lbl.setStyleSheet(f"color: {color}; font-weight: bold; font-size: 11px; border: none; background: transparent;")
-        self.change_lbl.setAlignment(Qt.AlignRight)
-        
-        price_layout.addWidget(self.price_lbl)
-        price_layout.addWidget(self.change_lbl)
-        
-        layout.addLayout(price_layout)
-        
-        layout.addStretch(1)
-        
-        self.sparkline = SparklineWidget(data.get('history', []), rvol=data.get('rvol', 1.0))
-        layout.addWidget(self.sparkline, 2)
+        self.change_lbl.setStyleSheet(f"color: {color}; font-weight: bold; font-size: 14px; border: none; background: transparent;")
+        self.change_lbl.setAlignment(Qt.AlignCenter)
+        layout.addWidget(self.change_lbl)
 
     def update_data(self, data):
         self.data = data
@@ -834,9 +845,7 @@ class TickerCard(QFrame):
         sign = "+" if change_val >= 0 else ""
         color = styles.COLORS['success'] if change_val >= 0 else styles.COLORS['danger']
         self.change_lbl.setText(f"{sign}{change_val:.2f} ({sign}{change_pct:.2f}%)")
-        self.change_lbl.setStyleSheet(f"color: {color}; font-weight: bold; font-size: 11px; border: none; background: transparent;")
-        
-        self.sparkline.update_data(data.get('history', []), rvol=data.get('rvol', 1.0))
+        self.change_lbl.setStyleSheet(f"color: {color}; font-weight: bold; font-size: 14px; border: none; background: transparent;")
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
@@ -1792,6 +1801,11 @@ class OpportunityCard(QFrame):
         except Exception as e:
             print(f"Error saving history: {e}")
 
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self.clicked.emit(self.data['symbol'])
+        super().mousePressEvent(event)
+
 class WhisperNumberWidget(QFrame):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -1842,6 +1856,7 @@ class WhisperNumberWidget(QFrame):
 class TalkingPointsView(QWidget):
     back_clicked = Signal()
     ticker_selected = Signal(str) # New signal for navigation
+    sectorClicked = Signal(str)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -1974,30 +1989,36 @@ class TalkingPointsView(QWidget):
         self.refresh_data()
 
     def refresh_data(self):
-        # Show loading state
-        QApplication.setOverrideCursor(Qt.WaitCursor)
-        try:
-            # 1. Morning Espresso & Regime
-            espresso_data = data_service.get_morning_espresso_narrative()
-            regime_data = data_service.detect_market_regime()
-            self.espresso.set_data(espresso_data, regime_data)
+        # 1. Morning Espresso & Regime (Async)
+        worker1 = Worker(self._fetch_espresso_data)
+        worker1.signals.result.connect(self._update_espresso)
+        QThreadPool.globalInstance().start(worker1)
+        
+        # 2. Sector Rotation (Async)
+        worker2 = Worker(data_service.analyze_sector_rotation)
+        worker2.signals.result.connect(self.sector_widget.set_data)
+        QThreadPool.globalInstance().start(worker2)
+        
+        # 3. Earnings (Async)
+        worker3 = Worker(data_service.get_earnings_calendar)
+        worker3.signals.result.connect(self.earnings_widget.set_data)
+        QThreadPool.globalInstance().start(worker3)
             
-            # 2. Sector Rotation
-            sectors = data_service.analyze_sector_rotation()
-            self.sector_widget.set_data(sectors)
+        # 4. Opportunities (Async)
+        self.refresh_opportunities(self.risk_selector.current_profile)
             
-            # 3. Earnings
-            earnings = data_service.get_earnings_calendar()
-            self.earnings_widget.set_data(earnings)
-            
-            # 2. Opportunities
-            self.refresh_opportunities(self.risk_selector.current_profile)
-            
-            # 3. Update Timestamp
-            now = datetime.now().strftime("%H:%M:%S")
-            self.last_updated_label.setText(f"Updated: {now}")
-        finally:
-            QApplication.restoreOverrideCursor()
+        # 5. Update Timestamp
+        now = datetime.now().strftime("%H:%M:%S")
+        self.last_updated_label.setText(f"Updated: {now}")
+
+    def _fetch_espresso_data(self):
+        return {
+            'narrative': data_service.get_morning_espresso_narrative(),
+            'regime': data_service.detect_market_regime()
+        }
+
+    def _update_espresso(self, data):
+        self.espresso.set_data(data['narrative'], data['regime'])
 
     def refresh_opportunities(self, profile):
         # Clear existing
@@ -2006,18 +2027,32 @@ class TalkingPointsView(QWidget):
             if item.widget():
                 item.widget().deleteLater()
                 
-        opps = data_service.get_opportunities(profile)
+        # Loading State
+        loading = QLabel("Scanning market...")
+        loading.setAlignment(Qt.AlignCenter)
+        loading.setStyleSheet(f"color: {styles.COLORS['text_secondary']}; font-style: italic;")
+        self.opp_layout.addWidget(loading)
+        
+        # Async Fetch
+        worker = Worker(data_service.get_opportunities, profile)
+        worker.signals.result.connect(self.display_opportunities)
+        QThreadPool.globalInstance().start(worker)
+
+    def display_opportunities(self, opps):
+        # Clear loading
+        while self.opp_layout.count():
+            item = self.opp_layout.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
         
         # Check Correlation of Top Picks
-        symbols = [o['symbol'] for o in opps]
-        correlation = data_service.analyze_portfolio_correlation(symbols)
+        if opps:
+            symbols = [o['symbol'] for o in opps]
+            # This is fast enough to do here, or make async too? 
+            # Let's assume fast enough for now, or skip to avoid lag
+            # correlation = data_service.analyze_portfolio_correlation(symbols)
+            pass 
         
-        # Update Risk Badge (reuse or create new)
-        if correlation > 0.7:
-             self.risk_selector.set_risk_warning(True, f"High Correlation: {correlation:.2f}")
-        else:
-             self.risk_selector.set_risk_warning(False)
-             
         for opp in opps:
             card = OpportunityCard(opp)
             # Connect click signal
@@ -2434,11 +2469,15 @@ class MarketNewsWidget(QFrame):
             lbl.setStyleSheet(f"color: {styles.COLORS['text_secondary']}; font-style: italic; border: none; background: transparent;")
             self.news_list.addWidget(lbl)
 
-class SectorView(QFrame):
-    back_clicked = Signal()
-    
-    def __init__(self, parent=None):
+class SectorPopup(QDialog):
+    ticker_clicked = Signal(str)
+
+    def __init__(self, sector_name, parent=None):
         super().__init__(parent)
+        self.sector_name = sector_name # Store for title
+        self.setWindowTitle(f"Sector Analysis: {sector_name}")
+        self.setModal(True)
+        self.resize(1000, 850) # Increased height
         self.setStyleSheet(f"background-color: {styles.COLORS['background']};")
         
         self.layout = QVBoxLayout(self)
@@ -2448,11 +2487,11 @@ class SectorView(QFrame):
         # Header
         header_row = QHBoxLayout()
         
-        back_btn = QPushButton("← BACK")
-        back_btn.setCursor(Qt.PointingHandCursor)
-        back_btn.setFixedSize(80, 30)
-        back_btn.clicked.connect(self.back_clicked.emit)
-        back_btn.setStyleSheet(f"""
+        close_btn = QPushButton("CLOSE")
+        close_btn.setCursor(Qt.PointingHandCursor)
+        close_btn.setFixedSize(80, 30)
+        close_btn.clicked.connect(self.close)
+        close_btn.setStyleSheet(f"""
             QPushButton {{
                 background-color: {styles.COLORS['surface']};
                 color: {styles.COLORS['text_secondary']};
@@ -2461,11 +2500,12 @@ class SectorView(QFrame):
                 font-weight: bold;
             }}
             QPushButton:hover {{
-                background-color: {styles.COLORS['surface_light']};
+                background-color: {styles.COLORS['danger']};
                 color: white;
+                border: 1px solid {styles.COLORS['danger']};
             }}
         """)
-        header_row.addWidget(back_btn)
+        header_row.addWidget(close_btn)
         
         self.title_lbl = QLabel("SECTOR VIEW")
         self.title_lbl.setStyleSheet("color: white; font-size: 24px; font-weight: 900; letter-spacing: 1px;")
@@ -2505,37 +2545,70 @@ class SectorView(QFrame):
             
         self.layout.addWidget(stats_container)
         
+        # Scroll Area for Content (Performers + News)
+        content_scroll = QScrollArea()
+        content_scroll.setWidgetResizable(True)
+        content_scroll.setStyleSheet("background: transparent; border: none;")
+        content_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        
+        content_widget = QWidget()
+        content_layout = QVBoxLayout(content_widget)
+        content_layout.setContentsMargins(0, 0, 0, 0)
+        content_layout.setSpacing(20)
+        
         # Top Performers
         perf_header = QLabel("TOP PERFORMERS")
-        perf_header.setStyleSheet(f"color: {styles.COLORS['accent']}; font-weight: 900; letter-spacing: 1px; font-size: 14px;")
-        self.layout.addWidget(perf_header)
+        perf_header.setStyleSheet(f"color: {styles.COLORS['success']}; font-weight: 900; letter-spacing: 1px; font-size: 14px;")
+        content_layout.addWidget(perf_header)
         
-        self.performers_scroll = QScrollArea()
-        self.performers_scroll.setWidgetResizable(True)
-        self.performers_scroll.setFixedHeight(220) # Height for cards
-        self.performers_scroll.setStyleSheet("background: transparent; border: none;")
-        self.performers_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.top_scroll, self.top_layout = self._create_card_list()
+        content_layout.addWidget(self.top_scroll)
         
-        self.performers_container = QWidget()
-        self.performers_layout = QHBoxLayout(self.performers_container)
-        self.performers_layout.setContentsMargins(0, 0, 0, 0)
-        self.performers_layout.setSpacing(15)
-        self.performers_layout.addStretch()
+        # Worst Performers
+        worst_header = QLabel("WORST PERFORMERS")
+        worst_header.setStyleSheet(f"color: {styles.COLORS['danger']}; font-weight: 900; letter-spacing: 1px; font-size: 14px;")
+        content_layout.addWidget(worst_header)
         
-        self.performers_scroll.setWidget(self.performers_container)
-        self.layout.addWidget(self.performers_scroll)
+        self.bottom_scroll, self.bottom_layout = self._create_card_list()
+        content_layout.addWidget(self.bottom_scroll)
         
         # News
         news_header = QLabel("SECTOR NEWS")
         news_header.setStyleSheet(f"color: {styles.COLORS['accent']}; font-weight: 900; letter-spacing: 1px; font-size: 14px;")
-        self.layout.addWidget(news_header)
+        content_layout.addWidget(news_header)
         
         self.news_widget = NewsTimelineWidget()
-        self.layout.addWidget(self.news_widget)
+        content_layout.addWidget(self.news_widget)
         
-    def set_data(self, sector_data, top_performers):
+        content_scroll.setWidget(content_widget)
+        self.layout.addWidget(content_scroll)
+        
+    def _create_card_list(self):
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFixedHeight(260)
+        scroll.setStyleSheet("background: transparent; border: none;")
+        scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        
+        container = QWidget()
+        layout = QHBoxLayout(container)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(15)
+        layout.addStretch()
+        
+        scroll.setWidget(container)
+        return scroll, layout
+        
+    def set_data(self, sector_data, performers):
+        # Even if sector_data is None, we might have performers.
+        # Construct dummy sector_data if needed to show something.
+        if not sector_data:
+            sector_data = {'name': self.sector_name if hasattr(self, 'sector_name') else 'SECTOR'}
+            
         # Header
-        self.title_lbl.setText(sector_data.get('name', 'SECTOR').upper())
+        # Use stored sector name if available, otherwise fallback to data
+        title = self.sector_name if hasattr(self, 'sector_name') else sector_data.get('name', 'SECTOR')
+        self.title_lbl.setText(title.upper())
         
         price = sector_data.get('price', 0)
         change = sector_data.get('change', 0)
@@ -2561,20 +2634,29 @@ class SectorView(QFrame):
             assets_str = f"${assets:,.0f}"
         self.stats_labels["ASSETS"].setText(assets_str)
         
-        # Top Performers
-        # Clear existing
-        while self.performers_layout.count() > 1: # Keep stretch at end
-            item = self.performers_layout.takeAt(0)
-            if item.widget():
-                item.widget().deleteLater()
-                
-        # Add new cards
-        # Insert before stretch (which is at index count-1)
-        for stock in top_performers:
-            card = TickerCard(stock)
-            card.setFixedSize(160, 200) # Compact card
-            self.performers_layout.insertWidget(self.performers_layout.count()-1, card)
+        # Helper to populate list
+        def populate_list(layout, items):
+            while layout.count() > 1: # Keep stretch
+                item = layout.takeAt(0)
+                if item.widget():
+                    item.widget().deleteLater()
             
-        # News (Mock for now, or fetch if available)
-        # self.news_widget.load_news(sector_data.get('symbol')) # If we had sector news
+            if not items:
+                lbl = QLabel("No data available")
+                lbl.setStyleSheet(f"color: {styles.COLORS['text_secondary']}; font-style: italic;")
+                layout.insertWidget(0, lbl)
+                return
+
+            for stock in items:
+                card = TickerCard(stock)
+                card.setFixedSize(180, 240)
+                card.clicked.connect(self.ticker_clicked.emit)
+                layout.insertWidget(layout.count()-1, card)
+                
+        # Populate Top and Bottom
+        top_list = performers.get('top', []) if performers else []
+        bottom_list = performers.get('bottom', []) if performers else []
+        
+        populate_list(self.top_layout, top_list)
+        populate_list(self.bottom_layout, bottom_list)
 
