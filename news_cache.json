@@ -2730,103 +2730,103 @@
     ]
   },
   "NVDA": {
-    "last_updated": "2025-11-25T21:21:16.057183",
+    "last_updated": "2025-11-25T22:24:57.550657",
     "articles": [
       {
-        "event_id": "NVDA_cd8b3fed-0f86-4833-bc89-8c009a316022",
+        "event_id": "NVDA_7dbc251e-9336-4f23-af1f-54c2038fc48c",
         "event_type": "NEWS",
         "symbol": "NVDA",
-        "timestamp": "2025-11-25T21:21:16.026154",
+        "timestamp": "2025-11-25T22:24:57.548316",
         "headline": "",
         "source": "Unknown",
         "url": "",
         "sentiment": "NEUTRAL"
       },
       {
-        "event_id": "NVDA_e3abf061-22e0-43f8-b192-57d3f3c18a91",
+        "event_id": "NVDA_e849c93a-927b-4f67-afd2-ad07b3c0a308",
         "event_type": "NEWS",
         "symbol": "NVDA",
-        "timestamp": "2025-11-25T21:21:16.026244",
+        "timestamp": "2025-11-25T22:24:57.548390",
         "headline": "",
         "source": "Unknown",
         "url": "",
         "sentiment": "NEUTRAL"
       },
       {
-        "event_id": "NVDA_0a8c27f6-5af6-4ba3-8426-d28f841fcbcb",
+        "event_id": "NVDA_d8c1535b-5a91-41ee-8511-5e835a30d9d8",
         "event_type": "NEWS",
         "symbol": "NVDA",
-        "timestamp": "2025-11-25T21:21:16.026277",
+        "timestamp": "2025-11-25T22:24:57.548424",
         "headline": "",
         "source": "Unknown",
         "url": "",
         "sentiment": "NEUTRAL"
       },
       {
-        "event_id": "NVDA_05bd7588-7b87-4ceb-9826-99404253f6ff",
+        "event_id": "NVDA_1c75e58c-1192-4f67-955b-7c985284e96b",
         "event_type": "NEWS",
         "symbol": "NVDA",
-        "timestamp": "2025-11-25T21:21:16.026299",
+        "timestamp": "2025-11-25T22:24:57.548446",
         "headline": "",
         "source": "Unknown",
         "url": "",
         "sentiment": "NEUTRAL"
       },
       {
-        "event_id": "NVDA_96930c38-4b21-4188-a655-2e7cf3f2ba71",
+        "event_id": "NVDA_7cb2d0b5-1c8d-4ce8-a9fd-10abdbff0422",
         "event_type": "NEWS",
         "symbol": "NVDA",
-        "timestamp": "2025-11-25T21:21:16.026325",
+        "timestamp": "2025-11-25T22:24:57.548465",
         "headline": "",
         "source": "Unknown",
         "url": "",
         "sentiment": "NEUTRAL"
       },
       {
-        "event_id": "NVDA_19ff3387-2602-4e77-acbd-baed5c41a140",
+        "event_id": "NVDA_5d5dfbf4-5638-40fc-813d-85329b599a27",
         "event_type": "NEWS",
         "symbol": "NVDA",
-        "timestamp": "2025-11-25T21:21:16.026354",
+        "timestamp": "2025-11-25T22:24:57.548486",
         "headline": "",
         "source": "Unknown",
         "url": "",
         "sentiment": "NEUTRAL"
       },
       {
-        "event_id": "NVDA_82da7071-e33e-454d-b897-0faa3c42cba6",
+        "event_id": "NVDA_dba206e2-ab23-4455-92eb-f634b5d05fdd",
         "event_type": "NEWS",
         "symbol": "NVDA",
-        "timestamp": "2025-11-25T21:21:16.026374",
+        "timestamp": "2025-11-25T22:24:57.548505",
         "headline": "",
         "source": "Unknown",
         "url": "",
         "sentiment": "NEUTRAL"
       },
       {
-        "event_id": "NVDA_cbc46ed4-7899-4e18-89ca-46a38f08fc53",
+        "event_id": "NVDA_f09563e5-5bf5-4ddd-9afb-1a2e869b592c",
         "event_type": "NEWS",
         "symbol": "NVDA",
-        "timestamp": "2025-11-25T21:21:16.026393",
+        "timestamp": "2025-11-25T22:24:57.548523",
         "headline": "",
         "source": "Unknown",
         "url": "",
         "sentiment": "NEUTRAL"
       },
       {
-        "event_id": "NVDA_fa4fd9ca-5faf-4f09-9e00-1f5502b13b18",
+        "event_id": "NVDA_f8ee5da5-4291-4565-8b42-0768b63c94be",
         "event_type": "NEWS",
         "symbol": "NVDA",
-        "timestamp": "2025-11-25T21:21:16.026416",
+        "timestamp": "2025-11-25T22:24:57.548541",
         "headline": "",
         "source": "Unknown",
         "url": "",
         "sentiment": "NEUTRAL"
       },
       {
-        "event_id": "NVDA_3997aa24-4357-4910-8ed4-50fc47eab2e7",
+        "event_id": "NVDA_2b4caa6f-d14f-4d75-8888-8bb734eceefc",
         "event_type": "NEWS",
         "symbol": "NVDA",
-        "timestamp": "2025-11-25T21:21:16.026437",
+        "timestamp": "2025-11-25T22:24:57.548562",
         "headline": "",
         "source": "Unknown",
         "url": "",
@@ -2932,6 +2932,220 @@
         "event_type": "NEWS",
         "symbol": "MSFT",
         "timestamp": "2025-11-25T22:16:24.677437",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      }
+    ]
+  },
+  "SHW": {
+    "last_updated": "2025-11-25T22:28:44.793626",
+    "articles": [
+      {
+        "event_id": "SHW_3b3e9c87-da15-4a58-8b48-8f4009dc0d28",
+        "event_type": "NEWS",
+        "symbol": "SHW",
+        "timestamp": "2025-11-25T22:28:44.791951",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "SHW_d37416e7-c2f8-40d2-a511-8fe0802307c2",
+        "event_type": "NEWS",
+        "symbol": "SHW",
+        "timestamp": "2025-11-25T22:28:44.792051",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "SHW_35d51960-9439-4f78-97d0-e3102bcf7926",
+        "event_type": "NEWS",
+        "symbol": "SHW",
+        "timestamp": "2025-11-25T22:28:44.792081",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "SHW_5f934895-2c49-43ce-a5b8-034991f7a1dc",
+        "event_type": "NEWS",
+        "symbol": "SHW",
+        "timestamp": "2025-11-25T22:28:44.792098",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "SHW_921bfe9a-057d-42a2-b906-8a235979988b",
+        "event_type": "NEWS",
+        "symbol": "SHW",
+        "timestamp": "2025-11-25T22:28:44.792119",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "SHW_955391cd-3bcb-4fdb-ba46-d3917d6e91c8",
+        "event_type": "NEWS",
+        "symbol": "SHW",
+        "timestamp": "2025-11-25T22:28:44.792145",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "SHW_b75ecc69-a659-49e0-8772-fe80d7f2c89a",
+        "event_type": "NEWS",
+        "symbol": "SHW",
+        "timestamp": "2025-11-25T22:28:44.792174",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "SHW_0d5b6d8e-4a00-4ea4-a349-3cc45fa46c0f",
+        "event_type": "NEWS",
+        "symbol": "SHW",
+        "timestamp": "2025-11-25T22:28:44.792201",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "SHW_e95cfc60-7c00-4ff8-9e99-702d8d375969",
+        "event_type": "NEWS",
+        "symbol": "SHW",
+        "timestamp": "2025-11-25T22:28:44.792228",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "SHW_28caa796-df34-4e86-a098-d8552033553c",
+        "event_type": "NEWS",
+        "symbol": "SHW",
+        "timestamp": "2025-11-25T22:28:44.792246",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      }
+    ]
+  },
+  "RALLY": {
+    "last_updated": "2025-11-25T22:29:47.456349",
+    "articles": []
+  },
+  "MRK": {
+    "last_updated": "2025-11-25T22:29:57.159805",
+    "articles": [
+      {
+        "event_id": "MRK_69af2152-8659-4166-8f10-d26a19233500",
+        "event_type": "NEWS",
+        "symbol": "MRK",
+        "timestamp": "2025-11-25T22:29:57.157965",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "MRK_d91b495d-574f-40f0-a3c4-a1f3dd7cfed0",
+        "event_type": "NEWS",
+        "symbol": "MRK",
+        "timestamp": "2025-11-25T22:29:57.158034",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "MRK_ce5de013-eb4e-4442-b0fb-05f8fb4b3e99",
+        "event_type": "NEWS",
+        "symbol": "MRK",
+        "timestamp": "2025-11-25T22:29:57.158062",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "MRK_271bc2ee-5309-41df-bd17-b094ba0282f7",
+        "event_type": "NEWS",
+        "symbol": "MRK",
+        "timestamp": "2025-11-25T22:29:57.158084",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "MRK_edac3163-f887-4d3a-8fdf-71b235fe463c",
+        "event_type": "NEWS",
+        "symbol": "MRK",
+        "timestamp": "2025-11-25T22:29:57.158103",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "MRK_779f1a97-dff0-490d-bd3d-90b6b769ad8d",
+        "event_type": "NEWS",
+        "symbol": "MRK",
+        "timestamp": "2025-11-25T22:29:57.158123",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "MRK_2ddc348c-035e-470a-b003-a154ed4d3ec7",
+        "event_type": "NEWS",
+        "symbol": "MRK",
+        "timestamp": "2025-11-25T22:29:57.158141",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "MRK_b3e8fcf4-b9f5-4be1-b94a-bc3f67f42dac",
+        "event_type": "NEWS",
+        "symbol": "MRK",
+        "timestamp": "2025-11-25T22:29:57.158159",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "MRK_f2c8b9d6-b417-42e7-a7d8-cadde54be00a",
+        "event_type": "NEWS",
+        "symbol": "MRK",
+        "timestamp": "2025-11-25T22:29:57.158178",
+        "headline": "",
+        "source": "Unknown",
+        "url": "",
+        "sentiment": "NEUTRAL"
+      },
+      {
+        "event_id": "MRK_699e7d6e-8ae9-4858-b1c8-507e40cadab6",
+        "event_type": "NEWS",
+        "symbol": "MRK",
+        "timestamp": "2025-11-25T22:29:57.158196",
         "headline": "",
         "source": "Unknown",
         "url": "",

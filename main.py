@@ -419,15 +419,16 @@ class MainWindow(QMainWindow):
         
         # Fetch sector data (Async)
         worker = Worker(self._fetch_sector_data, sector_name)
-        worker.signals.result.connect(lambda data: self._on_sector_data_ready(data))
+        worker.signals.result.connect(self._on_sector_data_ready)
         worker.signals.error.connect(lambda err: print(f"ERROR in show_sector: {err}"))
         self.threadpool.start(worker)
         
         self.sector_popup.show()
 
     def _on_sector_data_ready(self, data):
-        if self.sector_popup:
-            self.sector_popup.set_data(data[0], data[1])
+        if self.sector_popup and isinstance(data, tuple) and len(data) == 2:
+            sector_data, performers = data
+            self.sector_popup.set_data(sector_data, performers)
         
     def _fetch_sector_data(self, sector_name, progress_callback=None):
         # 1. Try to get data from existing cache first (fastest, no API)
