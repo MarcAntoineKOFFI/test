@@ -2,7 +2,7 @@
   "risk_profile": "BALANCED",
   "dark_mode": true,
   "notifications": true,
-  "rvol_threshold": 1.0,
+  "rvol_threshold": 2.1,
   "coverage_sectors": [],
   "client_tiers": {}
 }

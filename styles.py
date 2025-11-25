@@ -21,7 +21,8 @@ COLORS = {
     "sidebar_active_accent": "#2F80ED",
     "master_surface": "#141415",
     "sub_surface": "#1C1C1E",
-    "sub_surface_border": "#2C2C2E"
+    "sub_surface_border": "#2C2C2E",
+    "grid_line": "#27272A" # Added missing key
 }
 
 FONTS = {

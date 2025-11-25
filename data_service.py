@@ -1,15 +1,24 @@
-import json
-import os
-import uuid
 import yfinance as yf
-import random
-import datetime
-import time
-from enum import Enum
-import pytz
-from datetime import datetime, timedelta
 import pandas as pd
 import numpy as np
+import json
+import os
+import random
+from datetime import datetime, timedelta
+import time
+import pytz
+import uuid
+from enum import Enum
+from concurrent.futures import ThreadPoolExecutor
+
+# --- Caching & Async Globals ---
+DATA_CACHE = {}
+PENDING_REQUESTS = {}
+CACHE_DIR = "cache"
+os.makedirs(CACHE_DIR, exist_ok=True)
+
+# Thread Pool for Async Operations
+THREAD_POOL = ThreadPoolExecutor(max_workers=12)
 
 # --- Narrative Engine Types ---
 class TokenType(Enum):
@@ -59,11 +68,67 @@ STOCK_NAMES = {
     'PYPL': 'PayPal Holdings Inc.', 'CSCO': 'Cisco Systems Inc.', 'PFE': 'Pfizer Inc.'
 }
 
+# --- Caching Layer ---
+DATA_CACHE = {}
+PENDING_REQUESTS = {}
+CACHE_DIR = "cache"
+
+if not os.path.exists(CACHE_DIR):
+    os.makedirs(CACHE_DIR)
+
+def get_cached_data(key, max_age_seconds=60):
+    """Retrieves data from in-memory cache if valid."""
+    if key in DATA_CACHE:
+        entry = DATA_CACHE[key]
+        if time.time() - entry['timestamp'] < max_age_seconds:
+            return entry['data']
+    return None
+
+def set_cached_data(key, data):
+    """Stores data in in-memory cache."""
+    DATA_CACHE[key] = {
+        'data': data,
+        'timestamp': time.time()
+    }
+
+def get_file_cache(filename, max_age_hours=24):
+    """Retrieves data from file cache if valid."""
+    filepath = os.path.join(CACHE_DIR, filename)
+    if os.path.exists(filepath):
+        mtime = os.path.getmtime(filepath)
+        if time.time() - mtime < max_age_hours * 3600:
+            try:
+                with open(filepath, 'r') as f:
+                    return json.load(f)
+            except:
+                pass
+    return None
+
+def set_file_cache(filename, data):
+    """Stores data in file cache."""
+    filepath = os.path.join(CACHE_DIR, filename)
+    try:
+        with open(filepath, 'w') as f:
+            json.dump(data, f)
+    except Exception as e:
+        print(f"Error writing cache file {filename}: {e}")
 def fetch_stock_data(symbol, period="1mo", interval="1d"):
     """
     Fetches stock data using yfinance, falling back to mock data if it fails.
     Includes history for sparklines.
     """
+    # 1. Check Cache (Memory -> File)
+    cache_key = f"{symbol}_stock_{period}_{interval}"
+    cached = get_cached_data(cache_key)
+    if cached:
+        return cached
+        
+    # Check File Cache (1 hour expiry)
+    file_cached = get_file_cache(f"{symbol}_stock_data.json", max_age_hours=1)
+    if file_cached:
+        set_cached_data(cache_key, file_cached) # Populate memory cache
+        return file_cached
+
     try:
         ticker = yf.Ticker(symbol)
         # Get fast info if available
@@ -79,15 +144,13 @@ def fetch_stock_data(symbol, period="1mo", interval="1d"):
         change_percent = (change / prev_close) * 100
         
         # Fetch history for sparkline (last 30 points)
-        # Optimization: For a real app, we might cache this or fetch less frequently
         history = ticker.history(period=period, interval=interval)
         history_prices = history['Close'].tolist() if not history.empty else []
-        # Convert timestamps to string or unix timestamp
         history_dates = [dt.strftime("%Y-%m-%d") for dt in history.index] if not history.empty else []
         
         name = STOCK_NAMES.get(symbol, symbol)
         
-        return {
+        data = {
             'symbol': symbol,
             'price': price,
             'change': change,
@@ -101,10 +164,16 @@ def fetch_stock_data(symbol, period="1mo", interval="1d"):
             'high': info.day_high if info.day_high else price,
             'low': info.day_low if info.day_low else price,
             'volume': info.last_volume if info.last_volume else 0,
-            'pe_ratio': random.uniform(15, 60), # Mock PE for speed
-            'market_cap': info.market_cap if info.market_cap else 0
+            'market_cap': info.market_cap if info.market_cap else 0,
+            'pe_ratio': 0, # Placeholder
+            'dividend_yield': 0 # Placeholder
         }
         
+        # 2. Set Cache (In-Memory + File)
+        set_cached_data(cache_key, data)
+        set_file_cache(f"{symbol}_stock_data.json", data)
+        return data
+
     except Exception as e:
         # print(f"Error fetching {symbol}: {e}. Using mock data.")
         return generate_mock_data(symbol)
@@ -152,6 +221,47 @@ def generate_mock_data(symbol):
         'market_cap': random.uniform(10e9, 2e12)
     }
 
+def fetch_fundamentals(symbol):
+    """
+    Fetches fundamental data (ratios, margins, etc.) with file-based caching.
+    """
+    filename = f"{symbol}_fundamentals.json"
+    cached = get_file_cache(filename)
+    if cached:
+        return cached
+
+    try:
+        ticker = yf.Ticker(symbol)
+        info = ticker.info
+        
+        data = {
+            'market_cap': info.get('marketCap'),
+            'pe_ratio': info.get('trailingPE'),
+            'forward_pe': info.get('forwardPE'),
+            'peg_ratio': info.get('pegRatio'),
+            'price_to_book': info.get('priceToBook'),
+            'dividend_yield': info.get('dividendYield'),
+            'beta': info.get('beta'),
+            'profit_margins': info.get('profitMargins'),
+            'operating_margins': info.get('operatingMargins'),
+            'return_on_assets': info.get('returnOnAssets'),
+            'return_on_equity': info.get('returnOnEquity'),
+            'revenue_growth': info.get('revenueGrowth'),
+            'earnings_growth': info.get('earningsGrowth'),
+            'target_price': info.get('targetMeanPrice'),
+            'recommendation': info.get('recommendationKey'),
+            'sector': info.get('sector'),
+            'industry': info.get('industry'),
+            'description': info.get('longBusinessSummary')
+        }
+        
+        set_file_cache(filename, data)
+        return data
+        
+    except Exception as e:
+        print(f"Error fetching fundamentals for {symbol}: {e}")
+        return None
+
 def get_market_indices():
     results = []
     for index in MARKET_INDICES:
@@ -162,10 +272,12 @@ def get_market_indices():
 
 def get_top_gainers_losers():
     stock_data = []
-    for symbol in SAMPLE_STOCKS:
-        data = fetch_stock_data(symbol)
-        if data:
-            stock_data.append(data)
+    
+    # Parallel Fetching
+    with ThreadPoolExecutor(max_workers=10) as executor:
+        results = list(executor.map(fetch_stock_data, SAMPLE_STOCKS))
+    
+    stock_data = [d for d in results if d]
             
     stock_data.sort(key=lambda x: x['change_percent'], reverse=True)
     
@@ -487,23 +599,20 @@ def generate_narrative(symbol, indicators=None):
 def get_opportunities(risk_profile="BALANCED", settings=None):
     """
     Returns filtered opportunities based on REAL analysis and scoring.
+    Ensures at least 3 results are returned by prioritizing matches but allowing fallbacks.
     """
     if settings is None:
         settings = load_settings()
         
     # 1. Filter Pool based on mock risk profile mapping (simplified)
-    # In a real app, we'd map symbols to volatility profiles
     pool = list(STOCK_NAMES.keys())
     
-    # Filter by Sector (Problem Ten)
-    # We need to map sector names back to symbols or vice versa.
-    # SYMBOL_TO_SECTOR maps Symbol -> ETF (e.g. XLK).
-    # We need ETF -> Name mapping.
+    # Filter by Sector
     SECTOR_ETF_TO_NAME = {
         'XLK': 'Technology', 'XLF': 'Financials', 'XLE': 'Energy',
         'XLV': 'Healthcare', 'XLI': 'Industrials', 'XLP': 'Staples',
         'XLU': 'Utilities', 'XLY': 'Discretionary', 'XLB': 'Materials',
-        'XLC': 'Communication' # Added XLC
+        'XLC': 'Communication'
     }
     
     allowed_sectors = settings.get('coverage_sectors', [])
@@ -513,33 +622,41 @@ def get_opportunities(risk_profile="BALANCED", settings=None):
         etf = SYMBOL_TO_SECTOR.get(sym)
         if etf:
             sector_name = SECTOR_ETF_TO_NAME.get(etf, "Unknown")
-            # Check if sector is allowed (fuzzy match or exact?)
-            # Assuming exact match for now, or "All" logic
             if sector_name in allowed_sectors or not allowed_sectors:
                 filtered_pool.append(sym)
         else:
-            # If no sector mapping, include by default?
             filtered_pool.append(sym)
             
     pool = filtered_pool
     
-    # Limit pool for performance in this demo
+    # Limit pool for performance, but ensure enough candidates
     import random
     random.shuffle(pool)
-    pool = pool[:8] # Analyze random 8 stocks to keep it fast
+    pool = pool[:20] # Analyze 20 stocks to ensure we find enough matches
     
     scored_opps = []
     
-    for symbol in pool:
-        # Calculate Indicators
+    # Parallel Indicator Calculation
+    def process_symbol(symbol):
         indicators = calculate_real_indicators(symbol)
         if not indicators:
+            return None
+        return (symbol, indicators)
+
+    with ThreadPoolExecutor(max_workers=8) as executor:
+        results = list(executor.map(process_symbol, pool))
+        
+    for res in results:
+        if not res:
             continue
+            
+        symbol, indicators = res
             
         # Filter by RVOL Threshold (Problem Ten)
         min_rvol = settings.get('rvol_threshold', 0.0)
-        if indicators['rvol'] < min_rvol:
-            continue
+        is_rvol_ok = indicators['rvol'] >= min_rvol
+        # if indicators['rvol'] < min_rvol:
+        #     continue # Relaxed to ensure we get results
             
         # Calculate Confidence
         confidence = calculate_setup_confidence(indicators)
@@ -563,15 +680,33 @@ def get_opportunities(risk_profile="BALANCED", settings=None):
         pos_size = "0%"
         horizon = "Unknown"
         
+        # Risk Profile Logic
+        beta = indicators.get('beta', 1.0)
+        is_match = False
+        
+        # Determine Match & Setup based on Requested Profile
         if risk_profile == "DEFENSIVE":
+            is_defensive_sector = SYMBOL_TO_SECTOR.get(symbol) in ['XLP', 'XLU', 'XLV']
+            if beta <= 0.9 or is_defensive_sector: # Relaxed slightly from 0.85
+                is_match = True
+                
             stop_loss = price - (1.5 * atr)
             target = price + (2.0 * atr)
             pos_size = "2-3%"
+            
         elif risk_profile == "BALANCED":
+            if 0.7 <= beta <= 1.5: # Relaxed slightly
+                is_match = True
+                
             stop_loss = price - (2.0 * atr)
             target = price + (3.0 * atr)
             pos_size = "3-5%"
+            
         else: # SPECULATIVE
+            is_spec_sector = SYMBOL_TO_SECTOR.get(symbol) in ['XLK', 'XLC', 'XLY']
+            if beta >= 1.1 or is_spec_sector: # Relaxed from 1.2
+                is_match = True
+                
             stop_loss = price - (2.5 * atr)
             target = price + (5.0 * atr)
             pos_size = "5-8%"
@@ -607,17 +742,83 @@ def get_opportunities(risk_profile="BALANCED", settings=None):
                 'position_size': pos_size,
                 'time_horizon': horizon
             },
-            'rvol': indicators['rvol'], # For UI sparkline/badge
-            'history': [], # Could fetch if needed for sparkline
-            'change': 0.0, # Placeholder
-            'change_percent': 0.0 # Placeholder
+            'rvol': indicators['rvol'],
+            'history': [], 
+            'change': 0.0,
+            'change': 0.0,
+            'change_percent': 0.0,
+            'is_match': is_match,
+            'is_rvol_ok': is_rvol_ok
         })
         
-    # Sort by Opportunity Score
-    scored_opps.sort(key=lambda x: x['opp_score'], reverse=True)
+    # Sort by Match (True first), then RVOL OK, then Opportunity Score
+    scored_opps.sort(key=lambda x: (x['is_match'], x['is_rvol_ok'], x['opp_score']), reverse=True)
     
-    # Return top 3
-    return scored_opps[:3]
+    # Return top 10 (guarantees at least 3 if pool has 3 valid stocks)
+    return scored_opps[:10]
+
+def get_sector_data(sector_name):
+    """
+    Fetches comprehensive sector data using Sector ETFs as proxies.
+    """
+    SECTOR_NAME_TO_ETF = {v: k for k, v in SECTOR_ETF_TO_NAME.items()}
+    etf_symbol = SECTOR_NAME_TO_ETF.get(sector_name)
+    
+    if not etf_symbol:
+        return None
+        
+    try:
+        data = fetch_stock_data(etf_symbol)
+        if not data:
+            return None
+            
+        # Enrich with extra stats
+        ticker = yf.Ticker(etf_symbol)
+        info = ticker.info
+        
+        data['yield'] = info.get('yield', 0)
+        data['pe'] = info.get('trailingPE', 0)
+        data['beta'] = info.get('beta', 1.0)
+        data['assets'] = info.get('totalAssets', 0)
+        data['description'] = info.get('longBusinessSummary', f"Sector ETF for {sector_name}")
+        
+        return data
+    except Exception as e:
+        print(f"Error fetching sector data: {e}")
+        return None
+
+def get_sector_top_performers(sector_name, limit=5):
+    """
+    Returns top performing stocks in a sector.
+    For now, returns a sample list based on the sector mapping.
+    """
+    SECTOR_NAME_TO_ETF = {v: k for k, v in SECTOR_ETF_TO_NAME.items()}
+    etf = SECTOR_NAME_TO_ETF.get(sector_name)
+    
+    # Find symbols in this sector from our known list
+    sector_symbols = [s for s, e in SYMBOL_TO_SECTOR.items() if e == etf]
+    
+    # If we don't have enough, add some big names based on sector
+    if len(sector_symbols) < 3:
+        if sector_name == 'Technology': sector_symbols.extend(['AAPL', 'MSFT', 'NVDA', 'AMD', 'CRM'])
+        elif sector_name == 'Financials': sector_symbols.extend(['JPM', 'BAC', 'V', 'MA', 'GS'])
+        elif sector_name == 'Healthcare': sector_symbols.extend(['UNH', 'JNJ', 'PFE', 'LLY', 'MRK'])
+        elif sector_name == 'Consumer Discretionary': sector_symbols.extend(['AMZN', 'TSLA', 'HD', 'MCD', 'NKE'])
+        elif sector_name == 'Communication Services': sector_symbols.extend(['GOOGL', 'META', 'NFLX', 'DIS', 'TMUS'])
+    
+    sector_symbols = list(set(sector_symbols)) # Unique
+    
+    results = []
+    with ThreadPoolExecutor(max_workers=5) as executor:
+        futures = {executor.submit(fetch_stock_data, sym): sym for sym in sector_symbols}
+        for future in futures:
+            res = future.result()
+            if res:
+                results.append(res)
+                
+    # Sort by performance
+    results.sort(key=lambda x: x['change_percent'], reverse=True)
+    return results[:limit][:3]
 
 def get_morning_espresso_narrative():
     """
@@ -1370,3 +1571,47 @@ def get_comparison_data(target_symbol, comparison_symbols=None):
         'performance': performance_data,
         'correlation': correlation_matrix
     }
+
+# --- Async Wrappers ---
+
+def fetch_stock_data_async(symbol):
+    return THREAD_POOL.submit(fetch_stock_data, symbol)
+
+def fetch_fundamentals_async(symbol):
+    return THREAD_POOL.submit(fetch_fundamentals, symbol)
+
+def get_market_indices_async():
+    return THREAD_POOL.submit(get_market_indices)
+
+def get_top_gainers_losers_async():
+    return THREAD_POOL.submit(get_top_gainers_losers)
+
+def get_talking_points_async():
+    return THREAD_POOL.submit(get_talking_points)
+
+def get_morning_espresso_narrative_async():
+    return THREAD_POOL.submit(get_morning_espresso_narrative)
+
+def analyze_sector_rotation_async():
+    return THREAD_POOL.submit(analyze_sector_rotation)
+
+def get_earnings_calendar_async():
+    return THREAD_POOL.submit(get_earnings_calendar)
+
+def get_opportunities_async(profile):
+    return THREAD_POOL.submit(get_opportunities, profile)
+
+def fetch_detailed_ohlc_data_async(symbol, period="1mo", interval="1d"):
+    return THREAD_POOL.submit(fetch_detailed_ohlc_data, symbol, period, interval)
+
+def get_comparison_data_async(symbol):
+    return THREAD_POOL.submit(get_comparison_data, symbol)
+
+def fetch_news_for_symbol_async(symbol, lookback_hours=24):
+    return THREAD_POOL.submit(fetch_news_for_symbol, symbol, lookback_hours)
+
+def calculate_risk_metrics_async(symbol):
+    return THREAD_POOL.submit(calculate_risk_metrics, symbol)
+
+def get_idea_history_async():
+    return THREAD_POOL.submit(get_idea_history)
